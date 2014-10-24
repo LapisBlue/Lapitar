@@ -1,0 +1,47 @@
+// Apply Gradle plugins
+plugins {
+    id 'java'
+    id 'eclipse'
+    id 'idea'
+
+    //id 'com.github.hierynomus.license' version '0.11.0'
+}
+
+defaultTasks 'clean', /*'licenseFormat',*/ 'build'
+
+// Project information
+group = 'blue.lapis'
+version = '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+// Read source files using UTF-8
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+    options.deprecation = true
+}
+
+// Project repositories
+repositories {
+    mavenCentral()
+}
+
+// Project dependencies
+dependencies {
+    compile 'org.lwjgl.lwjgl:lwjgl:2.9.1'
+    testCompile 'junit:junit:4.11'
+    testCompile 'org.hamcrest:hamcrest-library:1.3'
+    testCompile 'org.mockito:mockito-core:1.10.8'
+}
+
+// License header formatting
+/*license {
+    header file('LICENSE')
+    sourceSets = project.sourceSets
+    ignoreFailures false
+    strictCheck true
+    mapping {
+        java = 'SLASHSTAR_STYLE'
+    }
+}*/

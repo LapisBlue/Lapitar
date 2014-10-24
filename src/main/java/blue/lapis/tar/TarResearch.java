@@ -1,17 +1,14 @@
 package blue.lapis.tar;
 
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.InputStream;
 import java.net.URL;
 import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 
 import javax.imageio.ImageIO;
 
 import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.Pbuffer;
 import org.lwjgl.opengl.PixelFormat;
@@ -34,11 +31,12 @@ public class TarResearch {
 		try {
 			init();
 			BufferedImage skin = ImageIO.read(new URL("https://s3.amazonaws.com/MinecraftSkins/"+player+".png"));
-			BufferedImage head = skin.getSubimage(0, 0, 32, 16);
-			upload(head);
-			draw();
+			BufferedImage head = skin.getSubimage(8, 8, 8, 8);
+			ImageIO.write(head, "png", new File(player+".head.png"));
+			draw(upload(head));
 			BufferedImage img = readPixels();
 			ImageIO.write(img, "png", new File(player+".png"));
+			cleanup();
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.exit(1);
@@ -63,49 +61,48 @@ public class TarResearch {
 		return img;
 	}
 	private static float quadRot = 45;
-	private static void draw() {
+	private static void draw(int id) throws Exception {
 		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 
 		GL11.glLoadIdentity();
-		
-		GL11.glLoadIdentity();
 		GL11.glTranslatef(0,0,-5);
 		GL11.glRotatef(quadRot,0f,1.0f,0f);
+		GL11.glRotatef(30,1.0f,0f,1.0f);
 		GL11.glColor3f(1, 1, 1);
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, id);
 		GL11.glBegin(GL11.GL_QUADS);
-			GL11.glTexCoord2f(0f, 0f);
-			GL11.glVertex3f( 1.0f, 1.0f,-1.0f);
-			GL11.glVertex3f(-1.0f, 1.0f,-1.0f);
-			GL11.glVertex3f(-1.0f, 1.0f, 1.0f);
-			GL11.glVertex3f( 1.0f, 1.0f, 1.0f);
-			GL11.glTexCoord2f(1f, 0f);
-			GL11.glVertex3f( 1.0f,-1.0f, 1.0f);
-			GL11.glVertex3f(-1.0f,-1.0f, 1.0f);
-			GL11.glVertex3f(-1.0f,-1.0f,-1.0f);
-			GL11.glVertex3f( 1.0f,-1.0f,-1.0f);
-			GL11.glTexCoord2f(1f, 1f);
-			GL11.glVertex3f( 1.0f, 1.0f, 1.0f);
-			GL11.glVertex3f(-1.0f, 1.0f, 1.0f);
-			GL11.glVertex3f(-1.0f,-1.0f, 1.0f);
-			GL11.glVertex3f( 1.0f,-1.0f, 1.0f);
-
-			GL11.glVertex3f( 1.0f,-1.0f,-1.0f);
-			GL11.glVertex3f(-1.0f,-1.0f,-1.0f);
-			GL11.glVertex3f(-1.0f, 1.0f,-1.0f);
-			GL11.glVertex3f( 1.0f, 1.0f,-1.0f);
-
-			GL11.glVertex3f(-1.0f, 1.0f, 1.0f);
-			GL11.glVertex3f(-1.0f, 1.0f,-1.0f);
-			GL11.glVertex3f(-1.0f,-1.0f,-1.0f);
-			GL11.glVertex3f(-1.0f,-1.0f, 1.0f);
-
-			GL11.glVertex3f( 1.0f, 1.0f,-1.0f);
-			GL11.glVertex3f( 1.0f, 1.0f, 1.0f);
-			GL11.glVertex3f( 1.0f,-1.0f, 1.0f);
-			GL11.glVertex3f( 1.0f,-1.0f,-1.0f);
+			GL11.glTexCoord2f( 0.0f, 1.0f ); GL11.glVertex3f( -1.0f, -1.0f, 1.0f );
+			GL11.glTexCoord2f( 1.0f, 1.0f ); GL11.glVertex3f(  1.0f, -1.0f, 1.0f );
+			GL11.glTexCoord2f( 1.0f, 0.0f ); GL11.glVertex3f(  1.0f,  1.0f, 1.0f );
+			GL11.glTexCoord2f( 0.0f, 0.0f ); GL11.glVertex3f( -1.0f,  1.0f, 1.0f );
+	 
+			GL11.glTexCoord2f( 0.0f, 0.0f ); GL11.glVertex3f( -1.0f, -1.0f, -1.0f );
+			GL11.glTexCoord2f( 0.0f, 1.0f ); GL11.glVertex3f( -1.0f,  1.0f, -1.0f );
+			GL11.glTexCoord2f( 1.0f, 1.0f ); GL11.glVertex3f(  1.0f,  1.0f, -1.0f );
+			GL11.glTexCoord2f( 1.0f, 0.0f ); GL11.glVertex3f(  1.0f, -1.0f, -1.0f );
+	 
+			GL11.glTexCoord2f( 1.0f, 1.0f ); GL11.glVertex3f( -1.0f,  1.0f, -1.0f );
+			GL11.glTexCoord2f( 1.0f, 0.0f ); GL11.glVertex3f( -1.0f,  1.0f,  1.0f );
+			GL11.glTexCoord2f( 0.0f, 0.0f ); GL11.glVertex3f(  1.0f,  1.0f,  1.0f );
+			GL11.glTexCoord2f( 0.0f, 1.0f ); GL11.glVertex3f(  1.0f,  1.0f, -1.0f );
+	 
+			GL11.glTexCoord2f( 0.0f, 1.0f ); GL11.glVertex3f( -1.0f, -1.0f, -1.0f );
+			GL11.glTexCoord2f( 1.0f, 1.0f ); GL11.glVertex3f(  1.0f, -1.0f, -1.0f );
+			GL11.glTexCoord2f( 1.0f, 0.0f ); GL11.glVertex3f(  1.0f, -1.0f,  1.0f );
+			GL11.glTexCoord2f( 0.0f, 0.0f ); GL11.glVertex3f( -1.0f, -1.0f,  1.0f );
+	 
+			GL11.glTexCoord2f( 0.0f, 0.0f ); GL11.glVertex3f( 1.0f, -1.0f, -1.0f );
+			GL11.glTexCoord2f( 0.0f, 1.0f ); GL11.glVertex3f( 1.0f,  1.0f, -1.0f );
+			GL11.glTexCoord2f( 1.0f, 1.0f ); GL11.glVertex3f( 1.0f,  1.0f,  1.0f );
+			GL11.glTexCoord2f( 1.0f, 0.0f ); GL11.glVertex3f( 1.0f, -1.0f,  1.0f );
+	 
+			GL11.glTexCoord2f( 1.0f, 0.0f ); GL11.glVertex3f( -1.0f, -1.0f, -1.0f );
+			GL11.glTexCoord2f( 0.0f, 0.0f ); GL11.glVertex3f( -1.0f, -1.0f,  1.0f );
+			GL11.glTexCoord2f( 0.0f, 1.0f ); GL11.glVertex3f( -1.0f,  1.0f,  1.0f );
+			GL11.glTexCoord2f( 1.0f, 1.0f ); GL11.glVertex3f( -1.0f,  1.0f, -1.0f );
 		GL11.glEnd();
 	}
-	private static void upload(BufferedImage img) {
+	private static int upload(BufferedImage img) {
 		int[] pixels = new int[img.getWidth()*img.getHeight()];
 		img.getRGB(0, 0, img.getWidth(), img.getHeight(), pixels, 0, img.getWidth());
 		ByteBuffer buf = BufferUtils.createByteBuffer(img.getWidth() * img.getHeight() * 4);
@@ -119,8 +116,15 @@ public class TarResearch {
 			}
 		}
 		buf.flip();
-		
+		IntBuffer textures = BufferUtils.createIntBuffer(16);
+		textures.limit(1);
+		GL11.glGenTextures(textures);
+		int id = textures.get(0);
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, id);
 		GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA8, img.getWidth(), img.getHeight(), 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buf);
+		GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
+		GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
+		return id;
 	}
 	private static void createBuffer() throws Exception {
 		buffer = new Pbuffer(width, height, new PixelFormat(), null, null);

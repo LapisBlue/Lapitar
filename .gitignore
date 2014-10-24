@@ -3,3 +3,5 @@
 # Eclipse
 .classpath
 .project
+/target/
+/.settings/

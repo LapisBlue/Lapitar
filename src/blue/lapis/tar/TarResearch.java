@@ -66,44 +66,44 @@ public class TarResearch {
 	private static void draw() {
 		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 
-        GL11.glLoadIdentity();
-        
-        GL11.glLoadIdentity();
-        GL11.glTranslatef(0,0,-5);
-        GL11.glRotatef(quadRot,0f,1.0f,0f);
-        GL11.glColor3f(1, 1, 1);
-        GL11.glBegin(GL11.GL_QUADS);
-        	GL11.glTexCoord2f(0f, 0f);
-            GL11.glVertex3f( 1.0f, 1.0f,-1.0f);
-            GL11.glVertex3f(-1.0f, 1.0f,-1.0f);
-            GL11.glVertex3f(-1.0f, 1.0f, 1.0f);
-            GL11.glVertex3f( 1.0f, 1.0f, 1.0f);
-            GL11.glTexCoord2f(1f, 0f);
-            GL11.glVertex3f( 1.0f,-1.0f, 1.0f);
-            GL11.glVertex3f(-1.0f,-1.0f, 1.0f);
-            GL11.glVertex3f(-1.0f,-1.0f,-1.0f);
-            GL11.glVertex3f( 1.0f,-1.0f,-1.0f);
-            GL11.glTexCoord2f(1f, 1f);
-            GL11.glVertex3f( 1.0f, 1.0f, 1.0f);
-            GL11.glVertex3f(-1.0f, 1.0f, 1.0f);
-            GL11.glVertex3f(-1.0f,-1.0f, 1.0f);
-            GL11.glVertex3f( 1.0f,-1.0f, 1.0f);
+		GL11.glLoadIdentity();
+		
+		GL11.glLoadIdentity();
+		GL11.glTranslatef(0,0,-5);
+		GL11.glRotatef(quadRot,0f,1.0f,0f);
+		GL11.glColor3f(1, 1, 1);
+		GL11.glBegin(GL11.GL_QUADS);
+			GL11.glTexCoord2f(0f, 0f);
+			GL11.glVertex3f( 1.0f, 1.0f,-1.0f);
+			GL11.glVertex3f(-1.0f, 1.0f,-1.0f);
+			GL11.glVertex3f(-1.0f, 1.0f, 1.0f);
+			GL11.glVertex3f( 1.0f, 1.0f, 1.0f);
+			GL11.glTexCoord2f(1f, 0f);
+			GL11.glVertex3f( 1.0f,-1.0f, 1.0f);
+			GL11.glVertex3f(-1.0f,-1.0f, 1.0f);
+			GL11.glVertex3f(-1.0f,-1.0f,-1.0f);
+			GL11.glVertex3f( 1.0f,-1.0f,-1.0f);
+			GL11.glTexCoord2f(1f, 1f);
+			GL11.glVertex3f( 1.0f, 1.0f, 1.0f);
+			GL11.glVertex3f(-1.0f, 1.0f, 1.0f);
+			GL11.glVertex3f(-1.0f,-1.0f, 1.0f);
+			GL11.glVertex3f( 1.0f,-1.0f, 1.0f);
 
-            GL11.glVertex3f( 1.0f,-1.0f,-1.0f);
-            GL11.glVertex3f(-1.0f,-1.0f,-1.0f);
-            GL11.glVertex3f(-1.0f, 1.0f,-1.0f);
-            GL11.glVertex3f( 1.0f, 1.0f,-1.0f);
+			GL11.glVertex3f( 1.0f,-1.0f,-1.0f);
+			GL11.glVertex3f(-1.0f,-1.0f,-1.0f);
+			GL11.glVertex3f(-1.0f, 1.0f,-1.0f);
+			GL11.glVertex3f( 1.0f, 1.0f,-1.0f);
 
-            GL11.glVertex3f(-1.0f, 1.0f, 1.0f);
-            GL11.glVertex3f(-1.0f, 1.0f,-1.0f);
-            GL11.glVertex3f(-1.0f,-1.0f,-1.0f);
-            GL11.glVertex3f(-1.0f,-1.0f, 1.0f);
+			GL11.glVertex3f(-1.0f, 1.0f, 1.0f);
+			GL11.glVertex3f(-1.0f, 1.0f,-1.0f);
+			GL11.glVertex3f(-1.0f,-1.0f,-1.0f);
+			GL11.glVertex3f(-1.0f,-1.0f, 1.0f);
 
-            GL11.glVertex3f( 1.0f, 1.0f,-1.0f);
-            GL11.glVertex3f( 1.0f, 1.0f, 1.0f);
-            GL11.glVertex3f( 1.0f,-1.0f, 1.0f);
-            GL11.glVertex3f( 1.0f,-1.0f,-1.0f);
-        GL11.glEnd();
+			GL11.glVertex3f( 1.0f, 1.0f,-1.0f);
+			GL11.glVertex3f( 1.0f, 1.0f, 1.0f);
+			GL11.glVertex3f( 1.0f,-1.0f, 1.0f);
+			GL11.glVertex3f( 1.0f,-1.0f,-1.0f);
+		GL11.glEnd();
 	}
 	private static void upload(BufferedImage img) {
 		int[] pixels = new int[img.getWidth()*img.getHeight()];
@@ -114,8 +114,8 @@ public class TarResearch {
 				int pixel = pixels[y*img.getWidth()+x];
 				buf.put((byte) ((pixel >> 16) & 0xFF));
 				buf.put((byte) ((pixel >> 8) & 0xFF));
-                buf.put((byte) (pixel & 0xFF));
-                buf.put((byte) ((pixel >> 24) & 0xFF));
+				buf.put((byte) (pixel & 0xFF));
+				buf.put((byte) ((pixel >> 24) & 0xFF));
 			}
 		}
 		buf.flip();
@@ -130,32 +130,32 @@ public class TarResearch {
 			System.err.println("Failed to set up PBuffer.");
 			System.exit(2);
 		}
-    }
-    private static void init() throws Exception {
-        createBuffer();
-        initGL();
-    }
+	}
+	private static void init() throws Exception {
+		createBuffer();
+		initGL();
+	}
 
-    private static void initGL() {
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
-        GL11.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-        GL11.glClearDepth(1.0);
-        GL11.glEnable(GL11.GL_DEPTH_TEST);
-        GL11.glDepthFunc(GL11.GL_LEQUAL);
+	private static void initGL() {
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		GL11.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+		GL11.glClearDepth(1.0);
+		GL11.glEnable(GL11.GL_DEPTH_TEST);
+		GL11.glDepthFunc(GL11.GL_LEQUAL);
 
-        GL11.glMatrixMode(GL11.GL_PROJECTION);
-        GL11.glLoadIdentity();
+		GL11.glMatrixMode(GL11.GL_PROJECTION);
+		GL11.glLoadIdentity();
 
-        GLU.gluPerspective(
-          45.0f,
-          (float)width / (float)height,
-          0.1f,
-          100.0f);
-        GL11.glMatrixMode(GL11.GL_MODELVIEW);
+		GLU.gluPerspective(
+		  45.0f,
+		  (float)width / (float)height,
+		  0.1f,
+		  100.0f);
+		GL11.glMatrixMode(GL11.GL_MODELVIEW);
 
-        GL11.glHint(GL11.GL_PERSPECTIVE_CORRECTION_HINT, GL11.GL_NICEST);
-    }
-    private static void cleanup() {
-        buffer.destroy();
-    }
+		GL11.glHint(GL11.GL_PERSPECTIVE_CORRECTION_HINT, GL11.GL_NICEST);
+	}
+	private static void cleanup() {
+		buffer.destroy();
+	}
 }

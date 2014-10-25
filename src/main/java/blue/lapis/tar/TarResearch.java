@@ -44,12 +44,13 @@ public class TarResearch {
 		parser.accepts("no-helm", "Don't render the helm portion of the skin.");
 		parser.accepts("no-shadow", "Don't render the shadow.");
 		parser.accepts("no-lighting", "Don't enable lighting.");
+		parser.accepts("stdout", "Write the render to standard out instead of a file.");
 		OptionSet options = parser.parse(args);
 		if (options.has("help")) {
 			try {
-				parser.printHelpOn(System.out);
-				System.out.println("Example: java -jar Tar.jar --angle 65 --tilt 30 Aesen_ Minecrell");
-				System.out.println("\tGenerates two output files, Minecrell.png, and Aesen_.png, with the given arguments");
+				parser.printHelpOn(System.err);
+				System.err.println("Example: java -jar Tar.jar --angle 65 --tilt 30 Aesen_ Minecrell");
+				System.err.println("\tGenerates two output files, Minecrell.png, and Aesen_.png, with the given arguments");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -62,9 +63,14 @@ public class TarResearch {
 		boolean helmet = !options.has("no-helm");
 		boolean shadow = !options.has("no-shadow");
 		boolean lighting = !options.has("no-lighting");
+		boolean stdout = options.has("stdout");
+		if (options.nonOptionArguments().size() > 1 && stdout) {
+			System.err.println("Cannot bulk generate avatars when --stdout is specified");
+			System.exit(3);
+		}
 		for (Object o : options.nonOptionArguments()) {
 			String player = String.valueOf(o);
-			System.out.println("Creating avatar for "+player+" ("+(width/supersampling)+"x"+(height/supersampling)+", "+supersampling+"x supersampling, "+(!shadow?"without":"with")+" shadow, "+(!helmet?"without":"with")+" helmet, "+(!lighting?"without":"with")+" lighting, angle "+quadRot+"\u00B0)");
+			System.err.println("Creating avatar for "+player+" ("+(width/supersampling)+"x"+(height/supersampling)+", "+supersampling+"x supersampling, "+(!shadow?"without":"with")+" shadow, "+(!helmet?"without":"with")+" helmet, "+(!lighting?"without":"with")+" lighting, angle "+quadRot+"\u00B0)");
 			try {
 				long startTime = System.currentTimeMillis();
 				init();
@@ -120,17 +126,22 @@ public class TarResearch {
 					GL11.glBindTexture(GL11.GL_TEXTURE_2D, 2);
 						draw(1.05f, 1.05f, 1.05f);
 				}
-				System.out.println("Render complete (took "+((System.currentTimeMillis()-startTime)/1000f)+"s), writing output file");
+				System.err.println("Render complete (took "+((System.currentTimeMillis()-startTime)/1000f)+"s), writing output file");
 				startTime = System.currentTimeMillis();
 				BufferedImage img = readPixels();
 				BufferedImage out = new BufferedImage(width/supersampling, height/supersampling, BufferedImage.TYPE_INT_ARGB);
 				Graphics2D gout = out.createGraphics();
 				gout.drawImage(img.getScaledInstance(img.getWidth()/supersampling, img.getHeight()/supersampling, Image.SCALE_SMOOTH), 0, 0, null);
 				gout.dispose();
-				File file = new File(player+".png");
-				ImageIO.write(out, "png", file);
 				cleanup();
-				System.out.println("Successfully created "+file+" (took "+((System.currentTimeMillis()-startTime)/1000f)+"s); "+(file.length()/1024f)+"KiB)");
+				if (stdout) {
+					ImageIO.write(out, "png", System.out);
+					System.err.println("Wrote file out successfully");
+				} else {
+					File file = new File(player+".png");
+					ImageIO.write(out, "png", file);
+					System.err.println("Successfully created "+file+" (took "+((System.currentTimeMillis()-startTime)/1000f)+"s); "+(file.length()/1024f)+"KiB)");
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 				System.err.println("Failed to render head for "+player);

@@ -60,7 +60,7 @@ run {
 }
 
 startScripts {
-    defaultJvmOpts =  [ '-Djava.library.path=lib/natives/' ]
+    defaultJvmOpts =  [ '-Djava.library.path=../lib/natives/' ]
     classpath = classpath.filter {
         !it.name.contains('natives')
     }

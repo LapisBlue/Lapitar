@@ -19,7 +19,7 @@ version = '1.0-SNAPSHOT'
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
-mainClassName = 'blue.lapis.tar.TarResearch'
+mainClassName = 'blue.lapis.tar.Tar'
 
 ext {
     lwjgl = '2.9.1'
@@ -32,6 +32,7 @@ repositories {
 
 // Project dependencies
 dependencies {
+    compile 'com.google.guava:guava:18.0'
     compile "org.lwjgl.lwjgl:lwjgl:$lwjgl"
     compile "org.lwjgl.lwjgl:lwjgl_util:$lwjgl"
     compile 'net.sf.jopt-simple:jopt-simple:4.5'
@@ -56,7 +57,7 @@ natives {
 run {
     dependsOn unpackNatives
     systemProperty 'java.library.path', file('build/natives/' + com.stehno.gradle.natives.Platform.current().os)
-    args = [ 'Aesen_' ]
+    args = [ 'Minecrell', 'Falkreon', 'MDCreator', 'Aesen_' ]
 }
 
 startScripts {

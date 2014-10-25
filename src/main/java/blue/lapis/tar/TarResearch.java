@@ -81,6 +81,12 @@ public class TarResearch {
 		for (Object o : options.nonOptionArguments()) {
 			players.add(String.valueOf(o));
 		}
+		System.err.println("Initializing LWJGL");
+		try {
+			Class.forName("org.lwjgl.opengl.Display");
+		} catch (ClassNotFoundException e1) {
+			e1.printStackTrace();
+		}
 		for (String player : players) {
 			System.err.println("Creating avatar for "+player+" ("+(width/supersampling)+"x"+(height/supersampling)+", "+supersampling+"x supersampling, "+(!shadow?"without":"with")+" shadow, "+(!helmet?"without":"with")+" helmet, "+(!lighting?"without":"with")+" lighting, angle "+quadRot+"\u00B0)");
 			try {

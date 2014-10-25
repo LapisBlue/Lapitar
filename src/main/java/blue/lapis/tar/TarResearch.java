@@ -70,9 +70,7 @@ public class TarResearch {
 				init();
 				BufferedImage skin = ImageIO.read(new URL("https://s3.amazonaws.com/MinecraftSkins/"+player+".png"));
 				BufferedImage head = skin.getSubimage(0, 0, 32, 16);
-				ImageIO.write(head, "png", new File(player+".head.png"));
 				BufferedImage helm = skin.getSubimage(32, 0, 32, 16);
-				ImageIO.write(helm, "png", new File(player+".helm.png"));
 				GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 				lightPosition = BufferUtils.createFloatBuffer(4);
 			    lightPosition.mark();

@@ -9,6 +9,7 @@ import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -45,6 +46,8 @@ public class TarResearch {
 		parser.accepts("no-shadow", "Don't render the shadow.");
 		parser.accepts("no-lighting", "Don't enable lighting.");
 		parser.accepts("stdout", "Write the render to standard out instead of a file.");
+		parser.accepts("files", "Assume that non-option arguments are file paths and not player names.");
+		parser.accepts("urls", "Assume that non-option arguments are absolute URLs and not player names.");
 		OptionSet options = parser.parse(args);
 		if (options.has("help")) {
 			try {
@@ -64,17 +67,34 @@ public class TarResearch {
 		boolean shadow = !options.has("no-shadow");
 		boolean lighting = !options.has("no-lighting");
 		boolean stdout = options.has("stdout");
+		boolean files = options.has("files");
+		boolean urls = options.has("urls");
+		if (files && urls) {
+			System.err.println("--files and --urls are mutually exclusive");
+			System.exit(4);
+		}
+		List<String> players = new ArrayList<String>();
 		if (options.nonOptionArguments().size() > 1 && stdout) {
 			System.err.println("Cannot bulk generate avatars when --stdout is specified");
 			System.exit(3);
 		}
 		for (Object o : options.nonOptionArguments()) {
-			String player = String.valueOf(o);
+			players.add(String.valueOf(o));
+		}
+		for (String player : players) {
 			System.err.println("Creating avatar for "+player+" ("+(width/supersampling)+"x"+(height/supersampling)+", "+supersampling+"x supersampling, "+(!shadow?"without":"with")+" shadow, "+(!helmet?"without":"with")+" helmet, "+(!lighting?"without":"with")+" lighting, angle "+quadRot+"\u00B0)");
 			try {
 				long startTime = System.currentTimeMillis();
 				init();
-				BufferedImage skin = ImageIO.read(new URL("https://s3.amazonaws.com/MinecraftSkins/"+player+".png"));
+				URL url;
+				if (files) {
+					url = new File(player).toURI().toURL();
+				} else if (urls) {
+					url = new URL(player);
+				} else {
+					url = new URL("https://s3.amazonaws.com/MinecraftSkins/"+player+".png");
+				}
+				BufferedImage skin = ImageIO.read(url);
 				BufferedImage head = skin.getSubimage(0, 0, 32, 16);
 				BufferedImage helm = skin.getSubimage(32, 0, 32, 16);
 				GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
@@ -138,7 +158,8 @@ public class TarResearch {
 					ImageIO.write(out, "png", System.out);
 					System.err.println("Wrote file out successfully");
 				} else {
-					File file = new File(player+".png");
+					String[] split = url.getPath().split("/");
+					File file = new File(split[split.length-1]);
 					ImageIO.write(out, "png", file);
 					System.err.println("Successfully created "+file+" (took "+((System.currentTimeMillis()-startTime)/1000f)+"s); "+(file.length()/1024f)+"KiB)");
 				}

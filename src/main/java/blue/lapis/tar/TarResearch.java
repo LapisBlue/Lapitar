@@ -4,12 +4,21 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.List;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
+
+import joptsimple.HelpFormatter;
+import joptsimple.OptionDescriptor;
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
+import joptsimple.OptionSpec;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
@@ -18,21 +27,46 @@ import org.lwjgl.opengl.PixelFormat;
 import org.lwjgl.util.glu.GLU;
 
 public class TarResearch {
-	// make these switches at some point
-	public static final int supersampling = 4;
-	public static final int width = 256*supersampling;
-	public static final int height = 256*supersampling;
+	public static int supersampling = 4;
+	public static int width = 256*supersampling;
+	public static int height = 256*supersampling;
 	private static Pbuffer buffer;
 	private static FloatBuffer lightPosition;
 	private static FloatBuffer lightAmbient;
 	
 	public static void main(String[] args) {
-		if (args.length == 0) {
-			args = new String[] { "Aesen_" };
-		}
-		for (String player : args) {
-			System.out.println("Creating avatar for "+player);
+		OptionParser parser = new OptionParser();
+		parser.accepts("help", "Display this help.").forHelp();
+		OptionSpec<Float> angle = parser.accepts("angle", "The angle to render the head at, in degrees.").withRequiredArg().ofType(Float.class).defaultsTo(45f);
+		OptionSpec<Integer> widthSpec = parser.accepts("width", "The width of the canvas to render on, in pixels.").withRequiredArg().ofType(Integer.class).defaultsTo(256);
+		OptionSpec<Integer> heightSpec = parser.accepts("height", "The height of the canvas to render on, in pixels.").withRequiredArg().ofType(Integer.class).defaultsTo(256);
+		OptionSpec<Integer> supersamplingSpec = parser.accepts("supersampling", "The amount of supersampling to perform, as a multiplier to width and height").withRequiredArg().ofType(Integer.class).defaultsTo(4);
+		parser.accepts("no-helm", "Don't render the helm portion of the skin.");
+		parser.accepts("no-shadow", "Don't render the shadow.");
+		parser.accepts("no-lighting", "Don't enable lighting.");
+		OptionSet options = parser.parse(args);
+		if (options.has("help")) {
 			try {
+				parser.printHelpOn(System.out);
+				System.out.println("Example: java -jar Tar.jar --angle 65 --tilt 30 Aesen_ Minecrell");
+				System.out.println("\tGenerates two output files, Minecrell.png, and Aesen_.png, with the given arguments");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			return;
+		}
+		quadRot = options.valueOf(angle);
+		supersampling = options.valueOf(supersamplingSpec);
+		width = options.valueOf(widthSpec)*supersampling;
+		height = options.valueOf(heightSpec)*supersampling;
+		boolean helmet = !options.has("no-helm");
+		boolean shadow = !options.has("no-shadow");
+		boolean lighting = !options.has("no-lighting");
+		for (Object o : options.nonOptionArguments()) {
+			String player = String.valueOf(o);
+			System.out.println("Creating avatar for "+player+" ("+(width/supersampling)+"x"+(height/supersampling)+", "+supersampling+"x supersampling, "+(!shadow?"without":"with")+" shadow, "+(!helmet?"without":"with")+" helmet, "+(!lighting?"without":"with")+" lighting, angle "+quadRot+"\u00B0)");
+			try {
+				long startTime = System.currentTimeMillis();
 				init();
 				BufferedImage skin = ImageIO.read(new URL("https://s3.amazonaws.com/MinecraftSkins/"+player+".png"));
 				BufferedImage head = skin.getSubimage(0, 0, 32, 16);
@@ -56,41 +90,53 @@ public class TarResearch {
 			    lightAmbient.put(1f);
 			    lightAmbient.reset();
 				upload(head, 1);
-				upload(helm, 2);
+				if (helmet) {
+					upload(helm, 2);
+				}
 				
-				GL11.glEnable(GL11.GL_BLEND);
-				GL11.glDisable(GL11.GL_TEXTURE_2D);
-				GL11.glPushMatrix();
-					GL11.glTranslatef(0f, -0.95f, -0.45f);
-					int count = 10;
-					for (int i = 0; i < count; i++) {
-						GL11.glTranslatef(0f, -0.01f, 0f);
-						GL11.glColor4f(0, 0, 0, (1-(i/(float)count))/2f);
-						draw(1.02f, 0.01f, 1.02f);
-					}
-				GL11.glPopMatrix();
+				if (shadow) {
+					GL11.glEnable(GL11.GL_BLEND);
+					GL11.glDisable(GL11.GL_TEXTURE_2D);
+					GL11.glPushMatrix();
+						GL11.glTranslatef(0f, -0.95f, -0.45f);
+						int count = 10;
+						for (int i = 0; i < count; i++) {
+							GL11.glTranslatef(0f, -0.01f, 0f);
+							GL11.glColor4f(0, 0, 0, (1-(i/(float)count))/2f);
+							draw(1.02f, 0.01f, 1.02f);
+						}
+					GL11.glPopMatrix();
+				}
 	
 				GL11.glEnable(GL11.GL_TEXTURE_2D);
-				GL11.glEnable(GL11.GL_LIGHTING);
-			    GL11.glEnable(GL11.GL_LIGHT0);
+				if (lighting) {
+					GL11.glEnable(GL11.GL_LIGHTING);
+			    	GL11.glEnable(GL11.GL_LIGHT0);
+				}
 	
 			    GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 				GL11.glColor3f(1, 1, 1);
 				GL11.glBindTexture(GL11.GL_TEXTURE_2D, 1);
 					draw(1.0f, 1.0f, 1.0f);
-				GL11.glBindTexture(GL11.GL_TEXTURE_2D, 2);
-					draw(1.05f, 1.05f, 1.05f);
-				
+				if (helmet) {
+					GL11.glBindTexture(GL11.GL_TEXTURE_2D, 2);
+						draw(1.05f, 1.05f, 1.05f);
+				}
+				System.out.println("Render complete (took "+((System.currentTimeMillis()-startTime)/1000f)+"s), writing output file");
+				startTime = System.currentTimeMillis();
 				BufferedImage img = readPixels();
 				BufferedImage out = new BufferedImage(width/supersampling, height/supersampling, BufferedImage.TYPE_INT_ARGB);
 				Graphics2D gout = out.createGraphics();
 				gout.drawImage(img.getScaledInstance(img.getWidth()/supersampling, img.getHeight()/supersampling, Image.SCALE_SMOOTH), 0, 0, null);
 				gout.dispose();
-				ImageIO.write(out, "png", new File(player+".png"));
+				File file = new File(player+".png");
+				ImageIO.write(out, "png", file);
 				cleanup();
+				System.out.println("Successfully created "+file+" (took "+((System.currentTimeMillis()-startTime)/1000f)+"s); "+(file.length()/1024f)+"KiB)");
 			} catch (Exception e) {
 				e.printStackTrace();
-				System.exit(1);
+				System.err.println("Failed to render head for "+player);
+				continue;
 			}
 		}
 	}
@@ -112,12 +158,12 @@ public class TarResearch {
 		}
 		return img;
 	}
-	private static float quadRot = 0;
+	private static float quadRot = 45;
 	private static void draw(float xScale, float yScale, float zScale) throws Exception {
 		GL11.glPushMatrix();
-			GL11.glTranslatef(0,0.25f,-5);
-			GL11.glRotatef(quadRot,0f,1.0f,0f);
 			GL11.glRotatef(20,1.0f,0f,0.0f);
+			GL11.glTranslatef(0,-1.5f,-4.5f);
+			GL11.glRotatef(quadRot,0f,1.0f,0f);
 			GL11.glLight(GL11.GL_LIGHT0, GL11.GL_POSITION, lightPosition);
 			GL11.glLight(GL11.GL_LIGHT0, GL11.GL_AMBIENT, lightAmbient);
 			GL11.glBegin(GL11.GL_QUADS);

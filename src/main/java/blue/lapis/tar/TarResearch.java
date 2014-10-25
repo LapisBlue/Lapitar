@@ -73,7 +73,7 @@ public class TarResearch {
 			System.err.println("--files and --urls are mutually exclusive");
 			System.exit(4);
 		}
-		List<String> players = new ArrayList<String>();
+		List<String> players = new ArrayList<>();
 		if (options.nonOptionArguments().size() > 1 && stdout) {
 			System.err.println("Cannot bulk generate avatars when --stdout is specified");
 			System.exit(3);
@@ -166,7 +166,6 @@ public class TarResearch {
 			} catch (Exception e) {
 				e.printStackTrace();
 				System.err.println("Failed to render head for "+player);
-				continue;
 			}
 		}
 	}

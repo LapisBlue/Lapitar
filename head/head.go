@@ -5,6 +5,7 @@ import (
 	"github.com/LapisBlue/Tar/head/glu"
 	"github.com/LapisBlue/Tar/skin"
 	"github.com/go-gl/glow/gl/1.1/gl"
+	"github.com/nfnt/resize"
 	"image"
 	"unsafe"
 )
@@ -23,8 +24,8 @@ type Renderer struct {
 
 func (r *Renderer) Render(sk *skin.Skin) (head image.Image, err error) {
 	if r.w == 0 || r.h == 0 {
-		r.w = r.Width  //* r.SuperSampling
-		r.h = r.Height //* r.SuperSampling
+		r.w = r.Width * r.SuperSampling
+		r.h = r.Height * r.SuperSampling
 	}
 
 	ctx, err := r.GL.Create(r.w, r.h)
@@ -90,8 +91,8 @@ func (r *Renderer) Render(sk *skin.Skin) (head image.Image, err error) {
 		r.draw(1.05, 1.05, 1.05)
 	}
 
-	// TODO: Super sampling
-	head = ctx.Render()
+	// Super sampling
+	head = resize.Resize(uint(r.Width), uint(r.Height), ctx.Render(), resize.Bicubic)
 	return
 }
 

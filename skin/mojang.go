@@ -11,13 +11,6 @@ const (
 	skinURL = "http://skins.minecraft.net/MinecraftSkins/%s.png"
 )
 
-// Follow all redirects
-var skinClient = &http.Client{
-	CheckRedirect: func(*http.Request, []*http.Request) error {
-		return nil
-	},
-}
-
 func Download(player string) (skin *Skin, err error) {
 	resp, err := http.Get(fmt.Sprintf(skinURL, player))
 	if err != nil {

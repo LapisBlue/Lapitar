@@ -123,7 +123,7 @@ func prepareUpload(img *image.RGBA) *image.RGBA {
 		return img
 	}
 
-	// Convert image to RGBA
+	// While this image view (e.g. through SubImage) is faster, we need exactly this image only in memory for OpenGL
 	rgba := image.NewRGBA(img.Bounds())
 	pos := 0
 	for y := img.Bounds().Min.Y; y < img.Bounds().Max.Y; y++ {

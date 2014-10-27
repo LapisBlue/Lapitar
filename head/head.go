@@ -7,6 +7,7 @@ import (
 	"github.com/go-gl/glow/gl/1.1/gl"
 	"github.com/nfnt/resize"
 	"image"
+	"image/color"
 	"unsafe"
 )
 
@@ -96,9 +97,25 @@ func (r *Renderer) Render(sk *skin.Skin) (head image.Image, err error) {
 		r.draw(1.05, 1.05, 1.05)
 	}
 
-	// Super sampling
-	head = resize.Resize(uint(r.Width), uint(r.Height), ctx.Render(), resize.Bicubic)
+	// Super sampling, the result is flipped tbh
+	head = &flippedImage{resize.Resize(uint(r.Width), uint(r.Height), ctx.Render(), resize.Bicubic)}
 	return
+}
+
+type flippedImage struct {
+	image image.Image
+}
+
+func (f *flippedImage) Bounds() image.Rectangle {
+	return f.image.Bounds()
+}
+
+func (f *flippedImage) ColorModel() color.Model {
+	return f.image.ColorModel()
+}
+
+func (f *flippedImage) At(x, y int) color.Color {
+	return f.image.At(x, f.Bounds().Max.Y-y-1)
 }
 
 func prepareUpload(img *image.RGBA) *image.RGBA {

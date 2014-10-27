@@ -22,6 +22,11 @@ type Renderer struct {
 	Shadow, Lighting bool
 }
 
+var (
+	lightPosition = [...]float32{-4, 2, 1, 100}
+	lightAmbient  = [...]float32{3, 3, 3, 1}
+)
+
 func (r *Renderer) Render(sk *skin.Skin) (head image.Image, err error) {
 	if r.w == 0 || r.h == 0 {
 		r.w = r.Width * r.SuperSampling
@@ -76,10 +81,10 @@ func (r *Renderer) Render(sk *skin.Skin) (head image.Image, err error) {
 	}
 
 	gl.Enable(gl.TEXTURE_2D)
-	/*if r.Lighting { TODO
+	if r.Lighting {
 		gl.Enable(gl.LIGHTING)
 		gl.Enable(gl.LIGHT0)
-	}*/
+	}
 
 	gl.BlendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
 	gl.Color3f(1, 1, 1)
@@ -130,9 +135,11 @@ func (r *Renderer) draw(x, y, z float32) {
 	gl.Rotatef(20, 1, 0, 0)
 	gl.Translatef(0, -1.5, -4.5)
 	gl.Rotatef(r.Angle, 0, 1, 0)
-	// TODO: Light
-	// GL11.glLight(GL11.GL_LIGHT0, GL11.GL_POSITION, lightPosition);
-	// GL11.glLight(GL11.GL_LIGHT0, GL11.GL_AMBIENT, lightAmbient);
+
+	// Lighting
+	gl.Lightfv(gl.LIGHT0, gl.POSITION, &lightPosition[0])
+	gl.Lightfv(gl.LIGHT0, gl.AMBIENT, &lightAmbient[0])
+
 	gl.Begin(gl.QUADS)
 	gl.Normal3f(0, 0, -1)
 

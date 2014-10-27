@@ -43,7 +43,7 @@ func (factory *osMesaContextFactory) Create(width, height int) (Context, error) 
 		return nil, osMesaError("CreateContextExt")
 	}
 
-	mesa.render = image.NewRGBA(image.Rect(0, 0, width-1, height-1))
+	mesa.render = image.NewRGBA(image.Rect(0, 0, width, height))
 	if !osmesa.MakeCurrent(mesa.ctx, unsafe.Pointer(&mesa.render.Pix[0]), osmesa.UNSIGNED_BYTE, width, height) {
 		return nil, osMesaError("MakeCurrent")
 	}

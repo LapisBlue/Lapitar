@@ -34,6 +34,8 @@ func (r *Renderer) Render(sk *skin.Skin) (head image.Image, err error) {
 
 	defer ctx.Close()
 
+	gl.Init()
+
 	gl.ClearColor(0.0, 0.0, 0.0, 0.0)
 	gl.ClearDepth(1.0)
 	gl.ShadeModel(gl.SMOOTH)
@@ -93,7 +95,28 @@ func (r *Renderer) Render(sk *skin.Skin) (head image.Image, err error) {
 	return
 }
 
+func prepareUpload(img *image.RGBA) *image.RGBA {
+	if img.Stride == img.Bounds().Dx()*4 {
+		return img
+	}
+
+	// Convert image to RGBA
+	rgba := image.NewRGBA(img.Bounds())
+	pos := 0
+	for y := img.Bounds().Min.Y; y < img.Bounds().Max.Y; y++ {
+		for x := img.Bounds().Min.X; x < img.Bounds().Max.X; x++ {
+			from := img.PixOffset(x, y)
+			for i := 0; i < 4; i, pos = i+1, pos+1 {
+				rgba.Pix[pos] = img.Pix[from+i]
+			}
+		}
+	}
+
+	return rgba
+}
+
 func uploadImage(img *image.RGBA, id uint32) {
+	img = prepareUpload(img)
 	gl.BindTexture(gl.TEXTURE_2D, id)
 	gl.TexImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, int32(img.Bounds().Dx()), int32(img.Bounds().Dy()), 0, gl.RGBA,
 		gl.UNSIGNED_BYTE, unsafe.Pointer(&img.Pix[0]))

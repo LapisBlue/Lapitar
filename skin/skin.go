@@ -96,8 +96,8 @@ func rgba(img image.Image) (rgba *image.RGBA) {
 
 	// Convert image to RGBA
 	rgba = image.NewRGBA(img.Bounds())
-	for y := img.Bounds().Min.Y; y <= img.Bounds().Max.Y; y++ {
-		for x := img.Bounds().Max.X; x <= img.Bounds().Max.X; x++ {
+	for y := img.Bounds().Min.Y; y < img.Bounds().Max.Y; y++ {
+		for x := img.Bounds().Min.X; x < img.Bounds().Max.X; x++ {
 			rgba.Set(x, y, img.At(x, y))
 		}
 	}

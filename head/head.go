@@ -1,105 +1,79 @@
 package head
 
+// #cgo darwin  LDFLAGS: -framework Carbon -framework OpenGL -framework GLUT
+// #cgo linux   LDFLAGS: -lGL -lGLU
+// #cgo windows LDFLAGS: -lopengl32 -lglu32
+// #cgo pkg-config: osmesa
+// #include "head.h"
+import "C"
 import (
-	"github.com/LapisBlue/Tar/head/glctx"
-	"github.com/LapisBlue/Tar/head/glu"
+	"errors"
 	"github.com/LapisBlue/Tar/skin"
-	"github.com/go-gl/glow/gl/1.1/gl"
 	"github.com/nfnt/resize"
 	"image"
 	"image/color"
 	"unsafe"
 )
 
-type Renderer struct {
-	GL glctx.ContextFactory
+func Render(
+	sk *skin.Skin,
+	angle float32,
+	width, height int,
+	superSampling int,
+	helmet bool,
+	shadow, lighting bool) (result image.Image, err error) {
 
-	Angle         float32
-	Width, Height int
-	w, h          int
-	SuperSampling int
-
-	Helmet           bool
-	Shadow, Lighting bool
-}
-
-var (
-	lightPosition = [...]float32{-4, 2, 1, 100}
-	lightAmbient  = [...]float32{3, 3, 3, 1}
-)
-
-func (r *Renderer) Render(sk *skin.Skin) (head image.Image, err error) {
-	if r.w == 0 || r.h == 0 {
-		r.w = r.Width * r.SuperSampling
-		r.h = r.Height * r.SuperSampling
+	w, h := width, height
+	if superSampling > 1 {
+		w = width * superSampling
+		h = height * superSampling
 	}
 
-	ctx, err := r.GL.Create(r.w, r.h)
-	if err != nil {
-		return
+	img := image.NewRGBA(image.Rect(0, 0, w, h))
+
+	head := prepareUpload(sk.Head(skin.All))
+	var helm *image.RGBA
+	if helmet {
+		helm = prepareUpload(sk.Helm(skin.All))
 	}
-
-	defer ctx.Close()
-
-	gl.Init()
-
-	gl.ClearColor(0.0, 0.0, 0.0, 0.0)
-	gl.ClearDepth(1.0)
-	gl.ShadeModel(gl.SMOOTH)
-	gl.Enable(gl.DEPTH_TEST)
-	gl.DepthFunc(gl.LEQUAL)
-
-	gl.MatrixMode(gl.PROJECTION)
-	gl.LoadIdentity()
-
-	glu.Perspective(45, float64(r.w)/float64(r.h), 0.1, 100)
-	gl.MatrixMode(gl.MODELVIEW)
-
-	gl.Hint(gl.PERSPECTIVE_CORRECTION_HINT, gl.NICEST)
-
-	gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
 	// Render the head
-	uploadImage(sk.Head(skin.All), 1)
-	if r.Helmet {
-		uploadImage(sk.Helm(skin.All), 2)
+	if !renderHead(angle, shadow, lighting, img, head, helm) {
+		return nil, errors.New("Rendering failed")
 	}
 
-	if r.Shadow {
-		gl.Enable(gl.BLEND)
-		gl.Disable(gl.TEXTURE_2D)
-		gl.PushMatrix()
-		gl.Translatef(0, -0.95, -0.45)
-
-		count := float32(10)
-		for i := float32(0); i < count; i++ {
-			gl.Translatef(0, -0.01, 0)
-			gl.Color4f(0, 0, 0, (1-(i/count))/2)
-			r.draw(1.02, 0.01, 1.02)
-		}
-
-		gl.PopMatrix()
+	result = img
+	if superSampling > 1 {
+		result = resize.Resize(uint(width), uint(height), result, resize.Bicubic)
 	}
 
-	gl.Enable(gl.TEXTURE_2D)
-	if r.Lighting {
-		gl.Enable(gl.LIGHTING)
-		gl.Enable(gl.LIGHT0)
-	}
-
-	gl.BlendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
-	gl.Color3f(1, 1, 1)
-	gl.BindTexture(gl.TEXTURE_2D, 1)
-	r.draw(1, 1, 1)
-
-	if r.Helmet {
-		gl.BindTexture(gl.TEXTURE_2D, 2)
-		r.draw(1.05, 1.05, 1.05)
-	}
-
-	// Super sampling, the result is flipped tbh
-	head = &flippedImage{resize.Resize(uint(r.Width), uint(r.Height), ctx.Render(), resize.Bicubic)}
+	// The result is flipped tbh
+	result = &flippedImage{result}
 	return
+}
+
+func renderHead(
+	angle float32,
+	shadow, lighting bool,
+	result *image.RGBA,
+	head *image.RGBA,
+	helm *image.RGBA) bool {
+
+	var helmPointer unsafe.Pointer
+	helmWidth, helmHeight := 0, 0
+	if helm != nil {
+		helmPointer = unsafe.Pointer(&helm.Pix[0])
+		helmWidth = helm.Bounds().Dx()
+		helmHeight = helm.Bounds().Dy()
+	}
+
+	return bool(
+		C.RenderHead(
+			C.float(angle),
+			C.bool(shadow), C.bool(lighting),
+			unsafe.Pointer(&result.Pix[0]), C.int(result.Bounds().Dx()), C.int(result.Bounds().Dy()),
+			unsafe.Pointer(&head.Pix[0]), C.int(head.Bounds().Dx()), C.int(head.Bounds().Dy()),
+			helmPointer, C.int(helmWidth), C.int(helmHeight)))
 }
 
 type flippedImage struct {
@@ -136,90 +110,4 @@ func prepareUpload(img *image.RGBA) *image.RGBA {
 	}
 
 	return rgba
-}
-
-func uploadImage(img *image.RGBA, id uint32) {
-	img = prepareUpload(img)
-	gl.BindTexture(gl.TEXTURE_2D, id)
-	gl.TexImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, int32(img.Bounds().Dx()), int32(img.Bounds().Dy()), 0, gl.RGBA,
-		gl.UNSIGNED_BYTE, unsafe.Pointer(&img.Pix[0]))
-	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
-	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
-}
-
-func (r *Renderer) draw(x, y, z float32) {
-	gl.PushMatrix()
-	gl.Rotatef(20, 1, 0, 0)
-	gl.Translatef(0, -1.5, -4.5)
-	gl.Rotatef(r.Angle, 0, 1, 0)
-
-	// Lighting
-	gl.Lightfv(gl.LIGHT0, gl.POSITION, &lightPosition[0])
-	gl.Lightfv(gl.LIGHT0, gl.AMBIENT, &lightAmbient[0])
-
-	gl.Begin(gl.QUADS)
-	gl.Normal3f(0, 0, -1)
-
-	// Front
-	gl.TexCoord2f(0.25, 1)
-	gl.Vertex3f(-x, -y, z)
-	gl.TexCoord2f(0.5, 1)
-	gl.Vertex3f(x, -y, z)
-	gl.TexCoord2f(0.5, 0.5)
-	gl.Vertex3f(x, y, z)
-	gl.TexCoord2f(0.25, 0.5)
-	gl.Vertex3f(-x, y, z)
-
-	// Back
-	gl.TexCoord2f(1, 1)
-	gl.Vertex3f(-x, -y, -z)
-	gl.TexCoord2f(1, 0.5)
-	gl.Vertex3f(-x, y, -z)
-	gl.TexCoord2f(0.75, 0.5)
-	gl.Vertex3f(x, y, -z)
-	gl.TexCoord2f(0.75, 1)
-	gl.Vertex3f(x, -y, -z)
-
-	// Top
-	gl.TexCoord2f(0.5, 0)
-	gl.Vertex3f(-x, y, -z)
-	gl.TexCoord2f(0.5, 0.5)
-	gl.Vertex3f(-x, y, z)
-	gl.TexCoord2f(0.25, 0.5)
-	gl.Vertex3f(x, y, z)
-	gl.TexCoord2f(0.25, 0)
-	gl.Vertex3f(x, y, -z)
-
-	// Bottom
-	gl.TexCoord2f(0.5, 0.5)
-	gl.Vertex3f(-x, -y, -z)
-	gl.TexCoord2f(0.75, 0.5)
-	gl.Vertex3f(x, -y, -z)
-	gl.TexCoord2f(0.75, 0)
-	gl.Vertex3f(x, -y, z)
-	gl.TexCoord2f(0.5, 0)
-	gl.Vertex3f(-x, -y, z)
-
-	// Left
-	gl.TexCoord2f(0.75, 1)
-	gl.Vertex3f(x, -y, -z)
-	gl.TexCoord2f(0.75, 0.5)
-	gl.Vertex3f(x, y, -z)
-	gl.TexCoord2f(0.5, 0.5)
-	gl.Vertex3f(x, y, z)
-	gl.TexCoord2f(0.5, 1)
-	gl.Vertex3f(x, -y, z)
-
-	// Right
-	gl.TexCoord2f(0, 1)
-	gl.Vertex3f(-x, -y, -z)
-	gl.TexCoord2f(0.25, 1)
-	gl.Vertex3f(-x, -y, z)
-	gl.TexCoord2f(0.25, 0.5)
-	gl.Vertex3f(-x, y, z)
-	gl.TexCoord2f(0, 0.5)
-	gl.Vertex3f(-x, y, -z)
-
-	gl.End()
-	gl.PopMatrix()
 }

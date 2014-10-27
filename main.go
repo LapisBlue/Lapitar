@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"github.com/LapisBlue/Tar/head"
-	"github.com/LapisBlue/Tar/head/glctx"
 	"github.com/LapisBlue/Tar/server"
 	"github.com/LapisBlue/Tar/skin"
 	"image/png"
@@ -37,21 +36,7 @@ func main() {
 
 	log.Println("Creating head for", player)
 
-	factory := glctx.OSMesa()
-	renderer := &head.Renderer{
-		GL: factory,
-
-		Angle:         45,
-		Width:         256,
-		Height:        256,
-		SuperSampling: 4,
-
-		Helmet:   true,
-		Shadow:   true,
-		Lighting: true,
-	}
-
-	img, err := renderer.Render(sk)
+	img, err := head.Render(sk, 45, 256, 256, 4, true, true, true)
 	if err != nil {
 		log.Fatalln(err)
 	}

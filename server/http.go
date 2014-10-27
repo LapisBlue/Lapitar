@@ -2,7 +2,6 @@ package server
 
 import (
 	"github.com/LapisBlue/Tar/head"
-	"github.com/LapisBlue/Tar/head/glctx"
 	"github.com/LapisBlue/Tar/skin"
 	"image/png"
 	"log"
@@ -11,25 +10,10 @@ import (
 )
 
 func Start(address string) error {
-	factory := glctx.OSMesa()
-	renderer := &head.Renderer{
-		GL: factory,
-
-		Angle:         45,
-		Width:         256,
-		Height:        256,
-		SuperSampling: 4,
-
-		Helmet:   true,
-		Shadow:   true,
-		Lighting: true,
-	}
-	return http.ListenAndServe(address, &headHandler{renderer})
+	return http.ListenAndServe(address, &headHandler{})
 }
 
-type headHandler struct {
-	r *head.Renderer
-}
+type headHandler struct{}
 
 func (h *headHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	player := r.RequestURI
@@ -46,7 +30,7 @@ func (h *headHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 	}
 
-	img, err := h.r.Render(sk)
+	img, err := head.Render(sk, 45, 256, 256, 4, true, true, true)
 	if err != nil {
 		log.Println(err)
 	}

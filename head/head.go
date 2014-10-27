@@ -90,7 +90,7 @@ func (r *Renderer) Render(sk *skin.Skin) (head image.Image, err error) {
 	gl.BlendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
 	gl.Color3f(1, 1, 1)
 	gl.BindTexture(gl.TEXTURE_2D, 1)
-	r.draw(1.05, 1.05, 1.05)
+	r.draw(1, 1, 1)
 
 	if r.Helmet {
 		gl.BindTexture(gl.TEXTURE_2D, 2)

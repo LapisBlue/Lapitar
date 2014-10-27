@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/LapisBlue/Tar/head"
 	"github.com/LapisBlue/Tar/head/glctx"
+	"github.com/LapisBlue/Tar/server"
 	"github.com/LapisBlue/Tar/skin"
 	"image/png"
 	"log"
@@ -22,6 +23,12 @@ func main() {
 	}
 
 	player := os.Args[1]
+
+	if player == "start" {
+		log.Fatalln(server.Start(os.Args[2]))
+		os.Exit(0)
+	}
+
 	log.Println("Downloading skin:", player)
 	sk, err := skin.Download(player)
 	if err != nil {

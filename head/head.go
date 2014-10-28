@@ -1,9 +1,6 @@
 package head
 
-// #cgo darwin  LDFLAGS: -framework Carbon -framework OpenGL -framework GLUT
-// #cgo linux   LDFLAGS: -lGL -lGLU
-// #cgo windows LDFLAGS: -lopengl32 -lglu32
-// #cgo pkg-config: osmesa
+// #cgo pkg-config: gl glu osmesa
 // #include "head.h"
 import "C"
 import (

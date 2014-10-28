@@ -2,4 +2,4 @@ Tar
 ===
 An avatar generator API thing.
 
-Research branch. Probably going to be messy, hacky, and slow.
+An mixture of C and Go. Go is used to provide the web server and the actual rendering is done with OpenGL in C and referenced using cgo from Go directly.

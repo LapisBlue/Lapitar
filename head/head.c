@@ -179,6 +179,7 @@ bool RenderHead(
             draw(1.05f, 1.05f, 1.05f, angle);
         }
 
+        glFinish();
         OSMesaDestroyContext(ctx);
         return true;
     }

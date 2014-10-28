@@ -1,6 +1,8 @@
 language: go
+before_install:
+  - sudo apt-get update -qq
+  - sudo apt-get install -y libosmesa6-dev libglu1-mesa-dev
 go:
-  - 1.0
   - 1.1
   - 1.2
   - 1.3

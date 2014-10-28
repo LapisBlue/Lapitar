@@ -19,7 +19,7 @@ OSMesaContext init_osmesa(int width, int height, void *buffer) {
 
 void init_gl(int width, int height) {
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-    glClearDepth(0.0f);
+    glClearDepth(1.0f);
     glShadeModel(GL_SMOOTH);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);

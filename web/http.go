@@ -1,4 +1,4 @@
-package server
+package web
 
 import (
 	"github.com/LapisBlue/Tar/head"

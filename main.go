@@ -10,11 +10,6 @@ import (
 	"os"
 )
 
-const (
-	width  = 256
-	height = 256
-)
-
 func main() {
 	if len(os.Args) <= 1 {
 		fmt.Fprintln(os.Stderr, "Usage: tar <player>")

@@ -31,7 +31,13 @@ func Render(
 	head := prepareUpload(sk.Head(skin.All))
 	var helm *image.RGBA
 	if helmet {
-		helm = prepareUpload(sk.Helm(skin.All))
+		helm = sk.Helm(skin.All)
+		if isSolidColor(helm) {
+			helm = nil
+			helmet = false
+		} else {
+			helm = prepareUpload(sk.Helm(skin.All))
+		}
 	}
 
 	// Render the head
@@ -87,6 +93,19 @@ func (f *flippedImage) ColorModel() color.Model {
 
 func (f *flippedImage) At(x, y int) color.Color {
 	return f.image.At(x, f.Bounds().Max.Y-y-1)
+}
+
+func isSolidColor(img image.Image) bool {
+	base := img.At(img.Bounds().Min.X, img.Bounds().Min.Y)
+	for y := img.Bounds().Min.Y; y < img.Bounds().Max.Y; y++ {
+		for x := img.Bounds().Min.X; x < img.Bounds().Max.X; x++ {
+			if img.At(x, y) != base {
+				return false
+			}
+		}
+	}
+
+	return true
 }
 
 func prepareUpload(img *image.RGBA) *image.RGBA {

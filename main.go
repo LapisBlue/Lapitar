@@ -3,13 +3,12 @@ package main
 import (
 	"fmt"
 	"github.com/LapisBlue/Tar/cli"
-	"github.com/LapisBlue/Tar/util"
 	"github.com/LapisBlue/Tar/web"
 	"os"
 	"path/filepath"
 )
 
-var usage = util.Usage().
+var usage = cli.Usage().
 	Cmd("Usage: %s <command> [args]").
 	Add("").
 	Add("Commands:").

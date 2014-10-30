@@ -2,10 +2,10 @@ package web
 
 import (
 	"fmt"
-	"github.com/LapisBlue/Tar/util"
+	"github.com/LapisBlue/Tar/cli"
 )
 
-var usage = util.Usage().
+var usage = cli.Usage().
 	Cmd("Usage: %s <address> [flags]").
 	Add("").
 	Add("Flags:").  // TODO

@@ -27,13 +27,13 @@ func runHead(name string, args []string) int {
 	superSampling := flags.IntP("supersampling", "s", headSuperSampling,
 		"The amount of super sampling to perform, as a multiplier to width and height.")
 	in := flags.StringP("in", "i", headInput, "The source of the list of players to render. Can be either a file, STDIN or ARGS.")
-	_ = flags.StringP("out", "o", headOutput, "The destination to write the result to. Can be either a file or STDOUT.") // TODO
+	out := flags.StringP("out", "o", headOutput, "The destination to write the result to. Can be either a file or STDOUT.")
 
 	nohelm := flags.Bool("no-helm", false, "Don't render the helm of the skin.")
 	noshadow := flags.Bool("no-shadow", false, "Don't render the shadow of the head.")
 	nolighting := flags.Bool("no-lighting", false, "Don't enable lighting.")
 
-	flagUsage(name, flags).
+	FlagUsage(name, flags).
 		Add("").
 		Add("Example:") // TODO
 
@@ -41,6 +41,8 @@ func runHead(name string, args []string) int {
 		flags.Usage()
 		return 1
 	}
+
+	watch := util.GlobalWatch().Start()
 
 	if flags.Parse(args) != nil {
 		return 1
@@ -51,18 +53,19 @@ func runHead(name string, args []string) int {
 		return 1
 	}
 
-	all := util.CreateStopWatch()
-	all.Start()
+	if isStdout(*out) && len(players) > 1 {
+		fmt.Fprintln(os.Stderr, "You can only render one image using STDOUT")
+		return 1
+	}
 
 	skins := downloadSkins(players)
 
 	fmt.Println()
 	fmt.Printf("Rendering %d heads, please wait...\n", len(skins))
+
+	watch.Mark()
 	heads := make([]image.Image, len(skins))
 
-	watch := util.CreateStopWatch()
-
-	watch.Start()
 	var err error
 	for i, skin := range skins {
 		if skin == nil {
@@ -80,15 +83,14 @@ func runHead(name string, args []string) int {
 		fmt.Println("Rendered head:", players[i], watch)
 	}
 
-	watch.Stop()
 	fmt.Println("Finished rendering heads", watch)
 
 	fmt.Println()
 	saveResults(players, heads)
 
 	fmt.Println()
-	all.Stop()
-	fmt.Println("Done!", all)
+	watch.Stop()
+	fmt.Println("Done!", watch)
 
 	return 0
 }

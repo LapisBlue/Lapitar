@@ -35,6 +35,10 @@ func readFrom(source string, args []string) []string {
 	}
 }
 
+func isStdout(out string) bool {
+	return out == "STDOUT" || out == "stdout"
+}
+
 func readLines(reader io.Reader) (lines []string, err error) {
 	scanner := bufio.NewScanner(reader)
 	for scanner.Scan() {
@@ -60,11 +64,10 @@ func readFile(path string) ([]string, error) {
 
 func downloadSkins(players []string) (result []*skin.Skin) {
 	fmt.Printf("Downloading %d skins, please wait...\n", len(players))
+
+	watch := util.GlobalWatch().Mark()
 	result = make([]*skin.Skin, len(players))
 
-	watch := util.CreateStopWatch()
-
-	watch.Start()
 	var err error
 	for i, player := range players {
 		watch.Mark()
@@ -77,7 +80,6 @@ func downloadSkins(players []string) (result []*skin.Skin) {
 		fmt.Println("Downloaded skin:", player, watch)
 	}
 
-	watch.Stop()
 	fmt.Println("Finished downloading skins", watch)
 	return
 }
@@ -85,9 +87,7 @@ func downloadSkins(players []string) (result []*skin.Skin) {
 func saveResults(players []string, results []image.Image) {
 	fmt.Printf("Saving %d images, please wait...\n", len(results))
 
-	watch := util.CreateStopWatch()
-
-	watch.Start()
+	watch := util.GlobalWatch().Mark()
 	for i, player := range players {
 		watch.Mark()
 
@@ -112,7 +112,6 @@ func saveResults(players []string, results []image.Image) {
 		fmt.Println("Saved image:", player, watch)
 	}
 
-	watch.Stop()
 	fmt.Println("Finished saving images", watch)
 	return
 }

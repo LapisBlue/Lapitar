@@ -26,9 +26,9 @@ func (h *headHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Println("Processing", player, "requested by", addrFor(r))
-	watch := util.CreateStopWatch()
 
-	watch.Start()
+	watch := util.StartedWatch()
+
 	sk, err := skin.Download(player)
 	watch.Stop()
 	if err != nil {
@@ -37,7 +37,7 @@ func (h *headHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Println("Downloaded skin:", player, watch)
 
-	watch.Reset().Start()
+	watch.Start()
 	img, err := head.Render(sk, 45, 256, 256, 4, true, true, true)
 	watch.Stop()
 	if err != nil {
@@ -46,7 +46,7 @@ func (h *headHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Println("Rendered head:", player, watch)
 
-	watch.Reset().Start()
+	watch.Start()
 	w.Header().Add("Content-Type", "image/png")
 
 	err = png.Encode(w, img)

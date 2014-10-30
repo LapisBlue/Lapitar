@@ -5,7 +5,7 @@ import (
 	"github.com/ogier/pflag"
 )
 
-func flagUsage(name string, flags *pflag.FlagSet) UsageSpec {
+func FlagUsage(name string, flags *pflag.FlagSet) UsageSpec {
 	usage := Usage().
 		Cmd("Usage: %s [flags] <names>").
 		Add("").

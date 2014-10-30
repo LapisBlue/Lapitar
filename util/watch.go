@@ -7,38 +7,34 @@ import (
 type StopWatch struct {
 	start   time.Time
 	elapsed time.Duration
-	mark    *time.Time
+	marks   []time.Time
 	running bool
 }
 
-func (watch *StopWatch) Start() bool {
-	if watch.running {
-		return false
-	}
-
-	watch.running = true
-	watch.start = time.Now()
-	return true
-}
-
-func (watch *StopWatch) Mark() {
-	now := time.Now()
-	watch.mark = &now
-}
-
-func (watch *StopWatch) Stop() bool {
+func (watch *StopWatch) Start() *StopWatch {
 	if !watch.running {
-		return false
+		watch.running = true
+		watch.start = time.Now()
 	}
 
-	watch.running = false
-	watch.elapsed += time.Now().Sub(watch.start)
-	return true
+	return watch
 }
 
-func (watch *StopWatch) Reset() *StopWatch {
-	watch.running = false
-	watch.elapsed = 0
+func (watch *StopWatch) Mark() *StopWatch {
+	if watch.running {
+		watch.marks = append(watch.marks, time.Now())
+	}
+
+	return watch
+}
+
+func (watch *StopWatch) Stop() *StopWatch {
+	if watch.running {
+		watch.marks = watch.marks[:0]
+		watch.elapsed = watch.Elapsed()
+		watch.running = false
+	}
+
 	return watch
 }
 
@@ -47,20 +43,41 @@ func (watch *StopWatch) IsRunning() bool {
 }
 
 func (watch *StopWatch) Elapsed() time.Duration {
-	if watch.mark != nil {
-		result := time.Now().Sub(*watch.mark)
-		watch.mark = nil
+	last := len(watch.marks)
+	if last > 0 {
+		result := time.Now().Sub(watch.marks[last-1])
+		watch.marks = watch.marks[:last-1]
 		return result
 	}
 
-	return watch.elapsed
+	if watch.running {
+		return time.Now().Sub(watch.start)
+	} else {
+		return watch.elapsed
+	}
 }
 
 func (watch *StopWatch) String() string {
 	return "(" + watch.Elapsed().String() + ")"
 }
 
-func CreateStopWatch() (watch *StopWatch) {
+func StartedWatch() (watch *StopWatch) {
+	watch = StoppedWatch()
+	watch.Start()
+	return
+}
+
+func StoppedWatch() (watch *StopWatch) {
 	watch = new(StopWatch)
 	return
+}
+
+var global *StopWatch
+
+func GlobalWatch() *StopWatch {
+	if global == nil {
+		global = StoppedWatch()
+	}
+
+	return global
 }

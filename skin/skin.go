@@ -4,10 +4,25 @@ import (
 	"image"
 )
 
-type Skin image.RGBA
+type cuttableImage interface {
+	image.Image
+	SubImage(r image.Rectangle) image.Image
+}
 
-func (skin *Skin) Image() *image.RGBA {
-	return (*image.RGBA)(skin)
+type Skin struct {
+	image cuttableImage
+}
+
+func Create(skin image.Image) *Skin {
+	if image, ok := skin.(cuttableImage); ok {
+		return &Skin{image}
+	}
+
+	return nil // TODO
+}
+
+func (skin *Skin) Image() image.Image {
+	return skin.image
 }
 
 // Head
@@ -21,8 +36,8 @@ var head = [faceCount]image.Rectangle{
 	rectFrom(24, 8, 8, 8),  // Back
 }
 
-func (skin *Skin) Head(face Face) *image.RGBA {
-	return rgba(skin.Image().SubImage(head[face]))
+func (skin *Skin) Head(face Face) image.Image {
+	return skin.image.SubImage(head[face])
 }
 
 // Helm
@@ -36,8 +51,8 @@ var helm = [faceCount]image.Rectangle{
 	rectFrom(56, 8, 8, 8),   // Back
 }
 
-func (skin *Skin) Helm(face Face) *image.RGBA {
-	return rgba(skin.Image().SubImage(helm[face]))
+func (skin *Skin) Helm(face Face) image.Image {
+	return skin.image.SubImage(helm[face])
 }
 
 // Body
@@ -51,8 +66,8 @@ var body = [faceCount]image.Rectangle{
 	rectFrom(32, 20, 8, 12),  // Back
 }
 
-func (skin *Skin) Body(face Face) *image.RGBA {
-	return rgba(skin.Image().SubImage(body[face]))
+func (skin *Skin) Body(face Face) image.Image {
+	return skin.image.SubImage(body[face])
 }
 
 // Arm
@@ -66,8 +81,8 @@ var arm = [faceCount]image.Rectangle{
 	rectFrom(52, 20, 4, 12),  // Back
 }
 
-func (skin *Skin) Arm(face Face) *image.RGBA {
-	return rgba(skin.Image().SubImage(arm[face]))
+func (skin *Skin) Arm(face Face) image.Image {
+	return skin.image.SubImage(arm[face])
 }
 
 // Leg
@@ -81,26 +96,10 @@ var leg = [faceCount]image.Rectangle{
 	rectFrom(12, 20, 4, 12), // Back
 }
 
-func (skin *Skin) Leg(face Face) *image.RGBA {
-	return rgba(skin.Image().SubImage(leg[face]))
+func (skin *Skin) Leg(face Face) image.Image {
+	return skin.image.SubImage(leg[face])
 }
 
 func rectFrom(x, y, width, height int) image.Rectangle {
 	return image.Rect(x, y, x+width, y+height)
-}
-
-func rgba(img image.Image) (rgba *image.RGBA) {
-	if rgba, ok := img.(*image.RGBA); ok {
-		return rgba
-	}
-
-	// Convert image to RGBA
-	rgba = image.NewRGBA(img.Bounds())
-	for y := img.Bounds().Min.Y; y < img.Bounds().Max.Y; y++ {
-		for x := img.Bounds().Min.X; x < img.Bounds().Max.X; x++ {
-			rgba.Set(x, y, img.At(x, y))
-		}
-	}
-
-	return
 }

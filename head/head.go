@@ -31,12 +31,12 @@ func Render(
 	head := prepareUpload(sk.Head(skin.All))
 	var helm *image.RGBA
 	if helmet {
-		helm = sk.Helm(skin.All)
-		if isSolidColor(helm) {
+		helmImg := sk.Helm(skin.All)
+		if isSolidColor(helmImg) {
 			helm = nil
 			helmet = false
 		} else {
-			helm = prepareUpload(sk.Helm(skin.All))
+			helm = prepareUpload(helmImg)
 		}
 	}
 
@@ -108,20 +108,17 @@ func isSolidColor(img image.Image) bool {
 	return true
 }
 
-func prepareUpload(img *image.RGBA) *image.RGBA {
-	if img.Stride == img.Bounds().Dx()*4 {
-		return img
+func prepareUpload(img image.Image) *image.RGBA {
+	// This image is already fine for uploading
+	if rgba, ok := img.(*image.RGBA); ok && rgba.Stride == rgba.Bounds().Dx()*4 {
+		return rgba
 	}
 
-	// While this image view (e.g. through SubImage) is faster, we need exactly this image only in memory for OpenGL
+	// Convert image to RGBA
 	rgba := image.NewRGBA(img.Bounds())
-	pos := 0
-	for y := img.Bounds().Min.Y; y < img.Bounds().Max.Y; y++ {
-		for x := img.Bounds().Min.X; x < img.Bounds().Max.X; x++ {
-			from := img.PixOffset(x, y)
-			for i := 0; i < 4; i, pos = i+1, pos+1 {
-				rgba.Pix[pos] = img.Pix[from+i]
-			}
+	for x := img.Bounds().Min.X; x < img.Bounds().Max.X; x++ {
+		for y := img.Bounds().Min.Y; y < img.Bounds().Max.Y; y++ {
+			rgba.Set(x, y, img.At(x, y))
 		}
 	}
 

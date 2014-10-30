@@ -34,5 +34,5 @@ func Download(player string) (skin *Skin, err error) {
 		return
 	}
 
-	return (*Skin)(rgba(img)), nil
+	return Create(img), nil
 }

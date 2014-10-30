@@ -3,9 +3,11 @@ package cli
 import (
 	"fmt"
 	"github.com/LapisBlue/Tar/head"
+	"github.com/LapisBlue/Tar/skin"
 	"github.com/LapisBlue/Tar/util"
 	"github.com/ogier/pflag"
 	"image"
+	"image/png"
 	"os"
 )
 
@@ -53,15 +55,35 @@ func runHead(name string, args []string) int {
 		return 1
 	}
 
-	if isStdout(*out) && len(players) > 1 {
-		fmt.Fprintln(os.Stderr, "You can only render one image using STDOUT")
-		return 1
+	if isStdout(*out) {
+		if len(players) > 1 {
+			fmt.Fprintln(os.Stderr, "You can only render one image using STDOUT")
+			return 1
+		}
+
+		player := players[0]
+		skin, err := skin.Download(player)
+		if err != nil {
+			return printError(err, "Failed to download skin:", player)
+		}
+
+		head, err := head.Render(skin, *angle, *width, *height, *superSampling, !*nohelm, !*noshadow, !*nolighting)
+		if err != nil {
+			return printError(err, "Failed to render head:", player)
+		}
+
+		err = png.Encode(os.Stdout, head)
+		if err != nil {
+			return printError(err, "Failed to write head to STDOUT")
+		}
+
+		return 0
 	}
 
 	skins := downloadSkins(players)
 
 	fmt.Println()
-	fmt.Printf("Rendering %d heads, please wait...\n", len(skins))
+	fmt.Printf("Rendering %d head(s), please wait...\n", len(skins))
 
 	watch.Mark()
 	heads := make([]image.Image, len(skins))
@@ -77,6 +99,7 @@ func runHead(name string, args []string) int {
 		heads[i], err = head.Render(skin, *angle, *width, *height, *superSampling, !*nohelm, !*noshadow, !*nolighting)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, "Failed to render head:", players[i], watch)
+			fmt.Fprintln(os.Stderr, err)
 			continue
 		}
 

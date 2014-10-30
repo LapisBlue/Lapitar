@@ -109,7 +109,7 @@ func runHead(name string, args []string) int {
 	fmt.Println("Finished rendering heads", watch)
 
 	fmt.Println()
-	saveResults(players, heads)
+	saveResults(players, heads, *out)
 
 	fmt.Println()
 	watch.Stop()

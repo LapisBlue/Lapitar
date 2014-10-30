@@ -9,6 +9,7 @@ import (
 	"image/png"
 	"io"
 	"os"
+	"strings"
 )
 
 func printError(err error, description ...interface{}) int {
@@ -90,7 +91,8 @@ func downloadSkins(players []string) (result []*skin.Skin) {
 	return
 }
 
-func saveResults(players []string, results []image.Image) {
+func saveResults(players []string, results []image.Image, dest string) {
+	format := strings.Contains(dest, "%s")
 	fmt.Printf("Saving %d image(s), please wait...\n", len(results))
 
 	watch := util.GlobalWatch().Mark()
@@ -102,7 +104,13 @@ func saveResults(players []string, results []image.Image) {
 			continue
 		}
 
-		name := player + ".png"
+		name := player
+		if format {
+			name = fmt.Sprintf(dest, name)
+		} else {
+			name = dest
+		}
+
 		file, err := os.Create(name)
 		if err != nil {
 			printError(err, "Failed to open file: ", name, watch)

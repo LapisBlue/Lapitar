@@ -1,24 +1,41 @@
 package web
 
 import (
+	"github.com/LapisBlue/Tar/face"
+	"github.com/LapisBlue/Tar/util"
 	"github.com/zenazn/goji/web"
+	"log"
 	"net/http"
 	"net/url"
 )
 
-func face(w http.ResponseWriter, r *http.Request, params url.Values) {
+func serveFace(c web.C, w http.ResponseWriter, r *http.Request, params url.Values) {
+	watch := util.StartedWatch()
+
 	conf := new(faceConfig)
 	*conf = *defaults.Face
 	decoder.Decode(conf, params) // Load the settings from the query
-	// TODO: Render face
+
+	player := c.URLParams["player"]
+	sk, err := downloadSkin(player, watch)
+	if err != nil {
+		return
+	}
+
+	watch.Mark()
+	result := face.Render(sk, conf.Size, conf.Helm)
+	log.Println("Rendered face:", player, watch)
+
+	sendResult(w, player, result, watch)
+	watch.Stop()
 }
 
-func serveFace(c web.C, w http.ResponseWriter, r *http.Request) {
-	face(w, r, r.URL.Query())
+func serveFaceNormal(c web.C, w http.ResponseWriter, r *http.Request) {
+	serveFace(c, w, r, r.URL.Query())
 }
 
 func serveFaceWithSize(c web.C, w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
 	query.Set("size", c.URLParams["size"])
-	face(w, r, query)
+	serveFace(c, w, r, query)
 }

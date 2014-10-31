@@ -15,10 +15,10 @@ func start(conf *config) {
 	defaults = conf
 	flag.Set("bind", conf.Address) // Uh, I guess that's a bit strange
 
-	register("/head/:player", serveHead)
+	register("/head/:player", serveHeadNormal)
 	register("/head/:size/:player", serveHeadWithSize)
 
-	register("/face/:player", serveFace)
+	register("/face/:player", serveFaceNormal)
 	register("/face/:size/:player", serveFaceWithSize)
 
 	goji.Serve()

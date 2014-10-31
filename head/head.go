@@ -6,7 +6,8 @@ import "C"
 import (
 	"errors"
 	"github.com/LapisBlue/Tar/skin"
-	"github.com/nfnt/resize"
+	"github.com/LapisBlue/Tar/util"
+	"github.com/disintegration/imaging"
 	"image"
 	"image/color"
 	"unsafe"
@@ -32,7 +33,7 @@ func Render(
 	var helm *image.RGBA
 	if helmet {
 		helmImg := sk.Helm(skin.All)
-		if isSolidColor(helmImg) {
+		if util.IsSolidColor(helmImg) {
 			helm = nil
 			helmet = false
 		} else {
@@ -47,7 +48,7 @@ func Render(
 
 	result = img
 	if superSampling > 1 {
-		result = resize.Resize(uint(width), uint(height), result, resize.Bicubic)
+		result = imaging.Resize(result, width, height, imaging.Hermite)
 	}
 
 	// The result is flipped tbh
@@ -93,19 +94,6 @@ func (f *flippedImage) ColorModel() color.Model {
 
 func (f *flippedImage) At(x, y int) color.Color {
 	return f.image.At(x, f.Bounds().Max.Y-y-1)
-}
-
-func isSolidColor(img image.Image) bool {
-	base := img.At(img.Bounds().Min.X, img.Bounds().Min.Y)
-	for y := img.Bounds().Min.Y; y < img.Bounds().Max.Y; y++ {
-		for x := img.Bounds().Min.X; x < img.Bounds().Max.X; x++ {
-			if img.At(x, y) != base {
-				return false
-			}
-		}
-	}
-
-	return true
 }
 
 func prepareUpload(img image.Image) *image.RGBA {

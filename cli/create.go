@@ -5,6 +5,11 @@ import (
 	"os"
 )
 
+const (
+	input  = "ARGS"
+	output = "%s.png"
+)
+
 var (
 	usage = Usage().
 		Cmd("Usage: %s <type> [flags] <names...>").

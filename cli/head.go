@@ -16,8 +16,6 @@ const (
 	headHeight        = 256
 	headAngle         = 45
 	headSuperSampling = 4
-	headInput         = "ARGS"
-	headOutput        = "%s.png"
 )
 
 func runHead(name string, args []string) int {
@@ -28,8 +26,8 @@ func runHead(name string, args []string) int {
 	angle := flags.Float32P("angle", "a", headAngle, "The angle to render the head at, in degrees.")
 	superSampling := flags.IntP("supersampling", "s", headSuperSampling,
 		"The amount of super sampling to perform, as a multiplier to width and height.")
-	in := flags.StringP("in", "i", headInput, "The source of the list of players to render. Can be either a file, STDIN or ARGS.")
-	out := flags.StringP("out", "o", headOutput, "The destination to write the result to. Can be either a file or STDOUT.")
+	in := flags.StringP("in", "i", input, "The source of the list of players to render. Can be either a file, STDIN or ARGS.")
+	out := flags.StringP("out", "o", output, "The destination to write the result to. Can be either a file or STDOUT.")
 
 	nohelm := flags.Bool("no-helm", false, "Don't render the helm of the skin.")
 	noshadow := flags.Bool("no-shadow", false, "Don't render the shadow of the head.")
@@ -98,8 +96,7 @@ func runHead(name string, args []string) int {
 
 		heads[i], err = head.Render(skin, *angle, *width, *height, *superSampling, !*nohelm, !*noshadow, !*nolighting)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, "Failed to render head:", players[i], watch)
-			fmt.Fprintln(os.Stderr, err)
+			printError(err, "Failed to render head:", players[i], watch)
 			continue
 		}
 

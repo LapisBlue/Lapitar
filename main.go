@@ -18,7 +18,7 @@ var usage = cli.Usage().
 	Add("").
 	Add("Commands:").
 	Help("create <type> [flags] <names...>", "Render an avatar using the command line.").
-	Help("server <address> [flags]", "Start the webserver.").
+	Help("server [flags]", "Start the webserver.").
 	Help("help [command]", "Display this help page or more information about another command.").
 	Add("").
 	Cmd("Type '%s help [command]' for more information about a command.")

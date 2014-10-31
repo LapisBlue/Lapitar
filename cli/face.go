@@ -51,14 +51,14 @@ func runFace(name string, args []string) int {
 		player := players[0]
 		skin, err := skin.Download(player)
 		if err != nil {
-			return printError(err, "Failed to download skin:", player)
+			return PrintError(err, "Failed to download skin:", player)
 		}
 
 		face := face.Render(skin, *size, *helm)
 
 		err = png.Encode(os.Stdout, face)
 		if err != nil {
-			return printError(err, "Failed to write face to STDOUT")
+			return PrintError(err, "Failed to write face to STDOUT")
 		}
 
 		return 0

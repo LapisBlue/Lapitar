@@ -62,17 +62,17 @@ func runHead(name string, args []string) int {
 		player := players[0]
 		skin, err := skin.Download(player)
 		if err != nil {
-			return printError(err, "Failed to download skin:", player)
+			return PrintError(err, "Failed to download skin:", player)
 		}
 
 		head, err := head.Render(skin, *angle, *width, *height, *superSampling, !*nohelm, !*noshadow, !*nolighting)
 		if err != nil {
-			return printError(err, "Failed to render head:", player)
+			return PrintError(err, "Failed to render head:", player)
 		}
 
 		err = png.Encode(os.Stdout, head)
 		if err != nil {
-			return printError(err, "Failed to write head to STDOUT")
+			return PrintError(err, "Failed to write head to STDOUT")
 		}
 
 		return 0
@@ -96,7 +96,7 @@ func runHead(name string, args []string) int {
 
 		heads[i], err = head.Render(skin, *angle, *width, *height, *superSampling, !*nohelm, !*noshadow, !*nolighting)
 		if err != nil {
-			printError(err, "Failed to render head:", players[i], watch)
+			PrintError(err, "Failed to render head:", players[i], watch)
 			continue
 		}
 

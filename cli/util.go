@@ -12,7 +12,7 @@ import (
 	"strings"
 )
 
-func printError(err error, description ...interface{}) int {
+func PrintError(err error, description ...interface{}) int {
 	fmt.Fprintln(os.Stderr, description...)
 	fmt.Fprintln(os.Stderr, err)
 	return 1
@@ -26,7 +26,7 @@ func readFrom(source string, args []string) []string {
 		// TODO: Let this start the generation once the first line is read
 		lines, err := readLines(os.Stdin)
 		if err != nil {
-			printError(err, "Failed to read from STDIN")
+			PrintError(err, "Failed to read from STDIN")
 			return nil
 		}
 
@@ -34,7 +34,7 @@ func readFrom(source string, args []string) []string {
 	default:
 		lines, err := readFile(source)
 		if err != nil {
-			printError(err, "Unable to read from %s: %s\n", source, err)
+			PrintError(err, "Unable to read from %s: %s\n", source, err)
 			return nil
 		}
 
@@ -80,7 +80,7 @@ func downloadSkins(players []string) (result []*skin.Skin) {
 		watch.Mark()
 		result[i], err = skin.Download(player)
 		if err != nil {
-			printError(err, "Failed to download skin:", player, watch)
+			PrintError(err, "Failed to download skin:", player, watch)
 			continue
 		}
 
@@ -113,13 +113,13 @@ func saveResults(players []string, results []image.Image, dest string) {
 
 		file, err := os.Create(name)
 		if err != nil {
-			printError(err, "Failed to open file: ", name, watch)
+			PrintError(err, "Failed to open file: ", name, watch)
 			continue
 		}
 
 		err = png.Encode(file, result)
 		if err != nil {
-			printError(err, "Failed to write image to file:", name, watch)
+			PrintError(err, "Failed to write image to file:", name, watch)
 			continue
 		}
 

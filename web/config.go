@@ -10,39 +10,38 @@ const (
 )
 
 type config struct {
-	Address string        `json:"address" xml:"address"`
-	Head    *headDefaults `json:"head" xml:"head"`
-	Face    *faceDefaults `json:"face" xml:"face"`
+	Address string      `json:"address" xml:"address"`
+	Head    *headConfig `json:"head" xml:"head"`
+	Face    *faceConfig `json:"face" xml:"face"`
 }
 
-type headDefaults struct {
-	Width         int     `json:"width" xml:"width"`
-	Height        int     `json:"height" xml:"height"`
-	Angle         float32 `json:"angle" xml:"angle"`
+type headConfig struct {
+	Size          int     `json:"size" xml:"size" schema:"size"`
+	Angle         float32 `json:"angle" xml:"angle" schema:"angle"`
 	SuperSampling int     `json:"supersampling" xml:"supersampling"`
-	Helm          bool    `json:"helm" xml:"helm"`
+	Helm          bool    `json:"helm" xml:"helm" schema:"helm"`
 	Shadow        bool    `json:"shadow" xml:"shadow"`
 	Lighting      bool    `json:"lighting" xml:"lighting"`
 }
 
-type faceDefaults struct {
-	Size int  `json:"size" xml:"size"`
-	Helm bool `json:"helm" xml:"helm"`
+type faceConfig struct {
+	Size int  `json:"size" xml:"size" schema:"size"`
+	Helm bool `json:"helm" xml:"helm" schema:"helm"`
 }
 
 func defaultConfig() *config {
 	return &config{
 		":8088",
-		&headDefaults{
-			256, 256,
+		&headConfig{
+			256,
 			45,
 			4,
 			true,
 			true,
 			true,
-		}, &faceDefaults{
+		}, &faceConfig{
 			256,
-			true,
+			false,
 		},
 	}
 }

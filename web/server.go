@@ -40,7 +40,8 @@ func Run(name string, args []string) int {
 		return exit
 	}
 
-	return 0
+	start(conf)
+	return 0 // TODO: What if the above fails?
 }
 
 func loadConfig(path string) (conf *config, exit int) {

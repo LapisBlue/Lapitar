@@ -70,7 +70,7 @@ func runFace(name string, args []string) int {
 	fmt.Printf("Rendering %d face(es), please wait...\n", len(skins))
 
 	watch.Mark()
-	heads := make([]image.Image, len(skins))
+	faces := make([]image.Image, len(skins))
 
 	for i, skin := range skins {
 		if skin == nil {
@@ -79,14 +79,14 @@ func runFace(name string, args []string) int {
 
 		watch.Mark()
 
-		heads[i] = face.Render(skin, *size, *helm)
+		faces[i] = face.Render(skin, *size, *helm)
 		fmt.Println("Rendered face:", players[i], watch)
 	}
 
 	fmt.Println("Finished rendering faces", watch)
 
 	fmt.Println()
-	saveResults(players, heads, *out)
+	saveResults(players, faces, *out)
 
 	fmt.Println()
 	watch.Stop()

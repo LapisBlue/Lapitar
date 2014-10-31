@@ -25,7 +25,7 @@ func serveHead(c web.C, w http.ResponseWriter, r *http.Request, params url.Value
 	watch.Mark()
 	result, err := head.Render(sk, conf.Angle, conf.Size, conf.Size, conf.SuperSampling, conf.Helm, conf.Shadow, conf.Lighting)
 	if err == nil {
-		log.Println("Rendered face:", player, watch)
+		log.Println("Rendered head:", player, watch)
 	} else {
 		printError(err, "Failed to render head:", player, watch)
 		return

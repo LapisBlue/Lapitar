@@ -6,7 +6,12 @@ import (
 	"github.com/LapisBlue/Tar/web"
 	"os"
 	"path/filepath"
+	"runtime"
 )
+
+func init() {
+	runtime.GOMAXPROCS(runtime.NumCPU())
+}
 
 var usage = cli.Usage().
 	Cmd("Usage: %s <command> [args]").

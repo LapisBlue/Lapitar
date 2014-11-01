@@ -5,14 +5,28 @@ import (
 	"fmt"
 	"image/png"
 	"net/http"
+	"regexp"
 )
 
 const (
 	skinURL = "http://skins.minecraft.net/MinecraftSkins/%s.png"
 )
 
+var (
+	namePattern = regexp.MustCompile("^[a-zA-Z0-9_]{1,16}$")
+	steve       = "https://minecraft.net/images/steve.png"
+	alex        = "https://minecraft.net/images/alex.png" // TODO
+)
+
 func Download(player string) (skin *Skin, err error) {
-	resp, err := http.Get(fmt.Sprintf(skinURL, player))
+	var url string
+	if namePattern.MatchString(player) {
+		url = fmt.Sprintf(skinURL, player)
+	} else {
+		url = steve
+	}
+
+	resp, err := http.Get(url)
 	if err != nil {
 		return
 	}

@@ -4,6 +4,7 @@ import (
 	"flag"
 	"github.com/gorilla/schema"
 	"github.com/zenazn/goji"
+	"net/http"
 )
 
 var (
@@ -20,6 +21,8 @@ func start(conf *config) {
 
 	register("/face/:player", serveFaceNormal)
 	register("/face/:size/:player", serveFaceWithSize)
+
+	goji.Get("/*", http.FileServer(http.Dir("www"))) // TODO: How to find the correct dir?
 
 	goji.Serve()
 }

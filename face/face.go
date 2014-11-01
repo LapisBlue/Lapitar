@@ -1,8 +1,8 @@
 package face
 
 import (
-	"github.com/LapisBlue/Tar/skin"
-	"github.com/LapisBlue/Tar/util"
+	"github.com/LapisBlue/Lapitar/skin"
+	"github.com/LapisBlue/Lapitar/util"
 	"github.com/disintegration/imaging"
 	"image"
 	"image/draw"

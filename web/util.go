@@ -1,8 +1,8 @@
 package web
 
 import (
-	"github.com/LapisBlue/Tar/skin"
-	"github.com/LapisBlue/Tar/util"
+	"github.com/LapisBlue/Lapitar/skin"
+	"github.com/LapisBlue/Lapitar/util"
 	"image"
 	"image/png"
 	"log"

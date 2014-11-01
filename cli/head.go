@@ -2,9 +2,9 @@ package cli
 
 import (
 	"fmt"
-	"github.com/LapisBlue/Tar/head"
-	"github.com/LapisBlue/Tar/skin"
-	"github.com/LapisBlue/Tar/util"
+	"github.com/LapisBlue/Lapitar/head"
+	"github.com/LapisBlue/Lapitar/skin"
+	"github.com/LapisBlue/Lapitar/util"
 	"github.com/ogier/pflag"
 	"image"
 	"image/png"

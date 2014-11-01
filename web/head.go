@@ -1,8 +1,8 @@
 package web
 
 import (
-	"github.com/LapisBlue/Tar/head"
-	"github.com/LapisBlue/Tar/util"
+	"github.com/LapisBlue/Lapitar/head"
+	"github.com/LapisBlue/Lapitar/util"
 	"github.com/zenazn/goji/web"
 	"log"
 	"net/http"

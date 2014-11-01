@@ -2,7 +2,7 @@ package web
 
 import (
 	"fmt"
-	"github.com/LapisBlue/Tar/cli"
+	"github.com/LapisBlue/Lapitar/cli"
 	"github.com/ogier/pflag"
 	"os"
 	"path/filepath"

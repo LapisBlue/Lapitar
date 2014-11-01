@@ -3,8 +3,8 @@ package cli
 import (
 	"bufio"
 	"fmt"
-	"github.com/LapisBlue/Tar/skin"
-	"github.com/LapisBlue/Tar/util"
+	"github.com/LapisBlue/Lapitar/skin"
+	"github.com/LapisBlue/Lapitar/util"
 	"image"
 	"image/png"
 	"io"

@@ -6,15 +6,17 @@ import (
 	"github.com/zenazn/goji/web"
 	"log"
 	"net/http"
-	"net/url"
 )
 
-func serveHead(c web.C, w http.ResponseWriter, r *http.Request, params url.Values) {
+func serveHead(c web.C, w http.ResponseWriter, r *http.Request, size int) {
 	watch := util.StartedWatch()
 
-	conf := new(headConfig)
-	*conf = *defaults.Head
-	decoder.Decode(conf, params) // Load the settings from the query
+	conf := defaults.Head
+	if size < head.MinimalSize {
+		size = head.MinimalSize
+	} else if size > conf.Size.Max {
+		size = conf.Size.Max
+	}
 
 	player := c.URLParams["player"]
 	sk, err := downloadSkin(player, watch)
@@ -23,7 +25,7 @@ func serveHead(c web.C, w http.ResponseWriter, r *http.Request, params url.Value
 	}
 
 	watch.Mark()
-	result, err := head.Render(sk, conf.Angle, conf.Size, conf.Size, conf.SuperSampling, conf.Helm, conf.Shadow, conf.Lighting)
+	result, err := head.Render(sk, conf.Angle, size, size, conf.SuperSampling, conf.Helm, conf.Shadow, conf.Lighting)
 	if err == nil {
 		log.Println("Rendered head:", player, watch)
 	} else {
@@ -36,11 +38,9 @@ func serveHead(c web.C, w http.ResponseWriter, r *http.Request, params url.Value
 }
 
 func serveHeadNormal(c web.C, w http.ResponseWriter, r *http.Request) {
-	serveHead(c, w, r, r.URL.Query())
+	serveHead(c, w, r, defaults.Head.Size.Def)
 }
 
 func serveHeadWithSize(c web.C, w http.ResponseWriter, r *http.Request) {
-	query := r.URL.Query()
-	query.Set("size", c.URLParams["size"])
-	serveHead(c, w, r, query)
+	serveHead(c, w, r, parseSize(c, defaults.Head.Size.Def))
 }

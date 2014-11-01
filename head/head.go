@@ -13,6 +13,10 @@ import (
 	"unsafe"
 )
 
+const (
+	MinimalSize = 32
+)
+
 func Render(
 	sk *skin.Skin,
 	angle float32,

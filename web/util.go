@@ -3,10 +3,12 @@ package web
 import (
 	"github.com/LapisBlue/Lapitar/skin"
 	"github.com/LapisBlue/Lapitar/util"
+	"github.com/zenazn/goji/web"
 	"image"
 	"image/png"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 func printError(err error, message ...interface{}) {
@@ -16,6 +18,16 @@ func printError(err error, message ...interface{}) {
 
 	log.Println(message...)
 	log.Println(err)
+}
+
+func parseSize(c web.C, def int) (result int) {
+	size := c.URLParams["size"]
+	result, err := strconv.Atoi(size)
+	if err != nil {
+		printError(err, "Failed to parse size", size)
+		return def
+	}
+	return
 }
 
 func downloadSkin(player string, watch *util.StopWatch) (sk *skin.Skin, err error) {

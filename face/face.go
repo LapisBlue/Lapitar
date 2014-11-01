@@ -8,6 +8,10 @@ import (
 	"image/draw"
 )
 
+const (
+	MinimalSize = 8
+)
+
 func Render(sk *skin.Skin, size int, helmet bool) image.Image {
 	face := sk.Head(skin.Front)
 	if helmet {
@@ -17,6 +21,10 @@ func Render(sk *skin.Skin, size int, helmet bool) image.Image {
 			draw.Draw(temp, face.Bounds(), helm, helm.Bounds().Min, draw.Over)
 			face = temp
 		}
+	}
+
+	if size == MinimalSize {
+		return face
 	}
 
 	return imaging.Resize(face, size, size, imaging.NearestNeighbor)

@@ -6,15 +6,17 @@ import (
 	"github.com/zenazn/goji/web"
 	"log"
 	"net/http"
-	"net/url"
 )
 
-func serveFace(c web.C, w http.ResponseWriter, r *http.Request, params url.Values) {
+func serveFace(c web.C, w http.ResponseWriter, r *http.Request, size int) {
 	watch := util.StartedWatch()
 
-	conf := new(faceConfig)
-	*conf = *defaults.Face
-	decoder.Decode(conf, params) // Load the settings from the query
+	conf := defaults.Head
+	if size < face.MinimalSize {
+		size = face.MinimalSize
+	} else if size > conf.Size.Max {
+		size = conf.Size.Max
+	}
 
 	player := c.URLParams["player"]
 	sk, err := downloadSkin(player, watch)
@@ -23,7 +25,7 @@ func serveFace(c web.C, w http.ResponseWriter, r *http.Request, params url.Value
 	}
 
 	watch.Mark()
-	result := face.Render(sk, conf.Size, conf.Helm)
+	result := face.Render(sk, size, conf.Helm)
 	log.Println("Rendered face:", player, watch)
 
 	sendResult(w, player, result, watch)
@@ -31,11 +33,9 @@ func serveFace(c web.C, w http.ResponseWriter, r *http.Request, params url.Value
 }
 
 func serveFaceNormal(c web.C, w http.ResponseWriter, r *http.Request) {
-	serveFace(c, w, r, r.URL.Query())
+	serveFace(c, w, r, defaults.Head.Size.Def)
 }
 
 func serveFaceWithSize(c web.C, w http.ResponseWriter, r *http.Request) {
-	query := r.URL.Query()
-	query.Set("size", c.URLParams["size"])
-	serveFace(c, w, r, query)
+	serveFace(c, w, r, parseSize(c, defaults.Face.Size.Def))
 }

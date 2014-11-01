@@ -16,31 +16,36 @@ type config struct {
 }
 
 type headConfig struct {
-	Size          int     `json:"size" xml:"size" schema:"size"`
-	Angle         float32 `json:"angle" xml:"angle" schema:"angle"`
-	SuperSampling int     `json:"supersampling" xml:"supersampling"`
-	Helm          bool    `json:"helm" xml:"helm" schema:"helm"`
-	Shadow        bool    `json:"shadow" xml:"shadow"`
-	Lighting      bool    `json:"lighting" xml:"lighting"`
+	Size          *limitedInt `json:"size" xml:"size" schema:"size"`
+	Angle         float32     `json:"angle" xml:"angle" schema:"angle"`
+	SuperSampling int         `json:"supersampling" xml:"supersampling"`
+	Helm          bool        `json:"helm" xml:"helm" schema:"helm"`
+	Shadow        bool        `json:"shadow" xml:"shadow"`
+	Lighting      bool        `json:"lighting" xml:"lighting"`
 }
 
 type faceConfig struct {
-	Size int  `json:"size" xml:"size" schema:"size"`
-	Helm bool `json:"helm" xml:"helm" schema:"helm"`
+	Size *limitedInt `json:"size" xml:"size" schema:"size"`
+	Helm bool        `json:"helm" xml:"helm" schema:"helm"`
+}
+
+type limitedInt struct {
+	Def int `json:"default" xml:"default"`
+	Max int `json:"max", xml:"max"`
 }
 
 func defaultConfig() *config {
 	return &config{
 		":8088",
 		&headConfig{
-			256,
+			&limitedInt{256, 512},
 			45,
 			4,
 			true,
 			true,
 			true,
 		}, &faceConfig{
-			256,
+			&limitedInt{256, 512},
 			false,
 		},
 	}

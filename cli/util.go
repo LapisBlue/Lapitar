@@ -3,7 +3,7 @@ package cli
 import (
 	"bufio"
 	"fmt"
-	"github.com/LapisBlue/Lapitar/skin"
+	"github.com/LapisBlue/Lapitar/mc"
 	"github.com/LapisBlue/Lapitar/util"
 	"github.com/disintegration/imaging"
 	"image"
@@ -91,16 +91,16 @@ func readFile(path string) ([]string, error) {
 	return readLines(file)
 }
 
-func downloadSkins(players []string) (result []*skin.Skin) {
+func downloadSkins(players []string) (result []*mc.Skin) {
 	fmt.Printf("Downloading %d skin(s), please wait...\n", len(players))
 
 	watch := util.GlobalWatch().Mark()
-	result = make([]*skin.Skin, len(players))
+	result = make([]*mc.Skin, len(players))
 
 	var err error
 	for i, player := range players {
 		watch.Mark()
-		result[i], err = skin.Download(player)
+		result[i], err = mc.Download(player)
 		if err != nil {
 			PrintError(err, "Failed to download skin:", player, watch)
 			continue

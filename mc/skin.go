@@ -1,4 +1,4 @@
-package skin
+package mc
 
 import (
 	"image"
@@ -13,7 +13,7 @@ type Skin struct {
 	image cuttableImage
 }
 
-func Create(skin image.Image) *Skin {
+func CreateSkin(skin image.Image) *Skin {
 	if image, ok := skin.(cuttableImage); ok {
 		return &Skin{image}
 	}

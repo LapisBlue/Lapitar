@@ -3,14 +3,17 @@ package main
 import (
 	"fmt"
 	"github.com/LapisBlue/Lapitar/cli"
-	"github.com/LapisBlue/Lapitar/web"
+	"github.com/LapisBlue/Lapitar/server"
+	"math/rand"
 	"os"
 	"path/filepath"
 	"runtime"
+	"time"
 )
 
 func init() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
+	rand.Seed(time.Now().UTC().UnixNano())
 }
 
 var usage = cli.Usage().
@@ -42,7 +45,7 @@ func Run(name string, args []string) int {
 	case "create":
 		return cli.Run(name+" "+command, args[1:])
 	case "server":
-		return web.Run(name+" "+command, args[1:])
+		return server.Run(name+" "+command, args[1:])
 	default:
 		fmt.Fprintf(os.Stderr, "Unknown command: '%s'\n", command)
 		return usage.Print(name)

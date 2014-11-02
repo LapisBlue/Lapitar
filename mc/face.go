@@ -1,4 +1,4 @@
-package skin
+package mc
 
 type Face byte
 

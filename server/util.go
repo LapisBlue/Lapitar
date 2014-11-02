@@ -1,7 +1,8 @@
-package web
+package server
 
 import (
-	"github.com/LapisBlue/Lapitar/skin"
+	"github.com/LapisBlue/Lapitar/mc"
+	"github.com/LapisBlue/Lapitar/server/cache"
 	"github.com/LapisBlue/Lapitar/util"
 	"github.com/zenazn/goji/web"
 	"image"
@@ -30,9 +31,9 @@ func parseSize(c web.C, def int) (result int) {
 	return
 }
 
-func downloadSkin(player string, watch *util.StopWatch) (sk *skin.Skin, err error) {
+func downloadSkin(player string, watch *util.StopWatch) (sk *mc.Skin, err error) {
 	watch.Mark()
-	sk, err = skin.Download(player)
+	sk, err = cache.GetSkin(player)
 	if err == nil {
 		log.Println("Downloaded skin:", player, watch)
 	} else {

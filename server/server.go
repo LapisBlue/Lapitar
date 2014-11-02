@@ -1,8 +1,9 @@
-package web
+package server
 
 import (
 	"fmt"
 	"github.com/LapisBlue/Lapitar/cli"
+	"github.com/LapisBlue/Lapitar/server/cache"
 	"github.com/ogier/pflag"
 	"os"
 	"path/filepath"
@@ -10,6 +11,7 @@ import (
 
 const (
 	serverConfig = "lapitar.json"
+	cacheFolder  = "caches"
 )
 
 func Run(name string, args []string) int {
@@ -17,6 +19,7 @@ func Run(name string, args []string) int {
 
 	dir := flags.StringP("dir", "d", ".", "The folder to save all files in.")
 	config := flags.StringP("config", "c", serverConfig, "The configuration file used to configure the server.")
+	cacheDir := flags.String("cache", cacheFolder, "The folder to cache rendered images in.")
 
 	cli.FlagUsage(name, flags)
 
@@ -39,6 +42,8 @@ func Run(name string, args []string) int {
 	if conf == nil {
 		return exit
 	}
+
+	cache.Init(*cacheDir)
 
 	start(conf)
 	return 0 // TODO: What if the above fails?

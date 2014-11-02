@@ -1,4 +1,4 @@
-package web
+package server
 
 import (
 	"github.com/LapisBlue/Lapitar/head"

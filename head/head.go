@@ -5,7 +5,7 @@ package head
 import "C"
 import (
 	"errors"
-	"github.com/LapisBlue/Lapitar/skin"
+	"github.com/LapisBlue/Lapitar/mc"
 	"github.com/LapisBlue/Lapitar/util"
 	"github.com/disintegration/imaging"
 	"image"
@@ -18,7 +18,7 @@ const MinimalSize = 32
 var DefaultScale = &imaging.Linear
 
 func Render(
-	sk *skin.Skin,
+	sk *mc.Skin,
 	angle float32,
 	width, height int,
 	superSampling int,
@@ -34,10 +34,10 @@ func Render(
 
 	img := image.NewRGBA(image.Rect(0, 0, w, h))
 
-	head := prepareUpload(sk.Head(skin.All))
+	head := prepareUpload(sk.Head(mc.All))
 	var helm *image.RGBA
 	if helmet {
-		helmImg := sk.Helm(skin.All)
+		helmImg := sk.Helm(mc.All)
 		if util.IsSolidColor(helmImg) {
 			helm = nil
 			helmet = false

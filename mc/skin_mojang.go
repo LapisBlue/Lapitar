@@ -1,36 +1,36 @@
-package skin
+package mc
 
 import (
 	"errors"
 	"fmt"
 	"image/png"
 	"net/http"
-	"regexp"
 	"strings"
 )
 
 const (
 	skinURL = "http://skins.minecraft.net/MinecraftSkins/%s.png"
+	Steve   = "https://minecraft.net/images/steve.png"
+	Alex    = "https://minecraft.net/images/alex.png"
 )
 
-var (
-	namePattern = regexp.MustCompile("^[a-zA-Z0-9_]{1,16}$")
-	steve       = "https://minecraft.net/images/steve.png"
-	alex        = "https://minecraft.net/images/alex.png" // TODO
-)
+func SkinURL(player string) string {
+	return fmt.Sprintf(skinURL, player)
+}
 
 func Download(player string) (skin *Skin, err error) {
 	var url string
+	url = fmt.Sprintf(skinURL, player)
 	// Char is only supported for compatibility with previous avatar services
 	switch {
-	case strings.EqualFold(player, "steve") || strings.EqualFold(player, "char"):
-		url = steve
+	case strings.EqualFold(player, "steve"):
+		url = Steve
 	case strings.EqualFold(player, "alex"):
-		url = alex
-	case namePattern.MatchString(player):
+		url = Alex
+	case IsName(player):
 		url = fmt.Sprintf(skinURL, player)
 	default:
-		url = steve // TODO
+		url = Steve // TODO
 	}
 
 	resp, err := http.Get(url)
@@ -55,5 +55,5 @@ func Download(player string) (skin *Skin, err error) {
 		return
 	}
 
-	return Create(img), nil
+	return CreateSkin(img), nil
 }

@@ -3,7 +3,7 @@ package cli
 import (
 	"fmt"
 	"github.com/LapisBlue/Lapitar/head"
-	"github.com/LapisBlue/Lapitar/skin"
+	"github.com/LapisBlue/Lapitar/mc"
 	"github.com/LapisBlue/Lapitar/util"
 	"github.com/ogier/pflag"
 	"image"
@@ -62,7 +62,7 @@ func runHead(name string, args []string) int {
 		}
 
 		player := players[0]
-		skin, err := skin.Download(player)
+		skin, err := mc.Download(player)
 		if err != nil {
 			return PrintError(err, "Failed to download skin:", player)
 		}

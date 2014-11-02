@@ -87,7 +87,7 @@ func writeSkinCached(name string, player string, skin *mc.Skin) (err error) {
 
 // TODO: Configurable
 func DefaultSkin() (*mc.Skin, error) {
-	if rand.Intn(1) == 0 {
+	if rand.Intn(2) == 0 {
 		return GetSkin("steve")
 	} else {
 		return GetSkin("alex")

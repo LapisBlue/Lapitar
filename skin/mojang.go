@@ -22,14 +22,15 @@ var (
 func Download(player string) (skin *Skin, err error) {
 	var url string
 	// Char is only supported for compatibility with previous avatar services
-	if strings.EqualFold(player, "steve") || strings.EqualFold(player, "char") {
+	switch {
+	case strings.EqualFold(player, "steve") || strings.EqualFold(player, "char"):
 		url = steve
-	} else if strings.EqualFold(player, "alex") {
+	case strings.EqualFold(player, "alex"):
 		url = alex
-	} else if namePattern.MatchString(player) {
+	case namePattern.MatchString(player):
 		url = fmt.Sprintf(skinURL, player)
-	} else {
-		url = steve
+	default:
+		url = steve // TODO
 	}
 
 	resp, err := http.Get(url)

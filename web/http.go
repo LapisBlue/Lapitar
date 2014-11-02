@@ -2,14 +2,13 @@ package web
 
 import (
 	"flag"
-	"github.com/gorilla/schema"
 	"github.com/zenazn/goji"
 	"net/http"
 )
 
 var (
 	defaults *config
-	decoder  = schema.NewDecoder()
+	//decoder  = schema.NewDecoder()
 )
 
 func start(conf *config) {

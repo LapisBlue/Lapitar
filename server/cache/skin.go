@@ -67,8 +67,7 @@ func loadSkinCached(name string) (skin *mc.Skin, err error) {
 }
 
 func writeSkinCached(name string, player string, skin *mc.Skin) (err error) {
-	path := filepath.Join(skinFolder, name)
-	file, err := os.Create(path)
+	file, err := os.Create(filepath.Join(skinFolder, name))
 	if err != nil {
 		return
 	}
@@ -80,11 +79,7 @@ func writeSkinCached(name string, player string, skin *mc.Skin) (err error) {
 	}
 
 	if name != player {
-		path, err = filepath.Abs(path)
-		if err != nil {
-			return
-		}
-		err = os.Symlink(path, filepath.Join(skinFolder, player))
+		err = os.Symlink(name, filepath.Join(skinFolder, player))
 	}
 
 	return

@@ -25,7 +25,7 @@ func serveFace(c web.C, w http.ResponseWriter, r *http.Request, size int) {
 	}
 
 	watch.Mark()
-	result := face.Render(sk, size, conf.Helm)
+	result := face.Render(sk, size, conf.Helm, conf.Scale.Get())
 	log.Println("Rendered face:", player, watch)
 
 	sendResult(w, player, result, watch)

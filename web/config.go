@@ -2,6 +2,10 @@ package web
 
 import (
 	"encoding/json"
+	"github.com/LapisBlue/Lapitar/face"
+	"github.com/LapisBlue/Lapitar/head"
+	"github.com/LapisBlue/Lapitar/util"
+	"github.com/disintegration/imaging"
 	"io"
 )
 
@@ -15,18 +19,18 @@ type config struct {
 	Face    *faceConfig `json:"face" xml:"face"`
 }
 
-type headConfig struct {
-	Size          *limitedInt `json:"size" xml:"size" schema:"size"`
-	Angle         float32     `json:"angle" xml:"angle" schema:"angle"`
-	SuperSampling int         `json:"supersampling" xml:"supersampling"`
-	Helm          bool        `json:"helm" xml:"helm" schema:"helm"`
-	Shadow        bool        `json:"shadow" xml:"shadow"`
-	Lighting      bool        `json:"lighting" xml:"lighting"`
+type faceConfig struct {
+	Size  *limitedInt `json:"size" xml:"size" schema:"size"`
+	Helm  bool        `json:"helm" xml:"helm" schema:"helm"`
+	Scale *scaling    `json:"scale" xml:"scale"`
 }
 
-type faceConfig struct {
-	Size *limitedInt `json:"size" xml:"size" schema:"size"`
-	Helm bool        `json:"helm" xml:"helm" schema:"helm"`
+type headConfig struct {
+	*faceConfig
+	Angle         float32 `json:"angle" xml:"angle" schema:"angle"`
+	SuperSampling int     `json:"supersampling" xml:"supersampling"`
+	Shadow        bool    `json:"shadow" xml:"shadow"`
+	Lighting      bool    `json:"lighting" xml:"lighting"`
 }
 
 type limitedInt struct {
@@ -38,15 +42,19 @@ func defaultConfig() *config {
 	return &config{
 		":8088",
 		&headConfig{
-			&limitedInt{256, 512},
-			45,
+			&faceConfig{
+				&limitedInt{256, 512},
+				true,
+				&scaling{head.DefaultScale},
+			},
+			-35,
 			4,
-			true,
 			true,
 			true,
 		}, &faceConfig{
 			&limitedInt{256, 512},
 			false,
+			&scaling{face.DefaultScale},
 		},
 	}
 }
@@ -68,5 +76,22 @@ func writeConfig(writer io.Writer, conf *config) (err error) {
 		return
 	}
 	_, err = io.WriteString(writer, "\n")
+	return
+}
+
+type scaling struct {
+	*imaging.ResampleFilter
+}
+
+func (scale *scaling) Get() *imaging.ResampleFilter {
+	return scale.ResampleFilter
+}
+
+func (scale *scaling) MarshalText() ([]byte, error) {
+	return []byte(util.ScaleName(scale.ResampleFilter)), nil
+}
+
+func (scale *scaling) UnmarshalText(text []byte) (err error) {
+	scale.ResampleFilter, err = util.ParseScale(string(text))
 	return
 }

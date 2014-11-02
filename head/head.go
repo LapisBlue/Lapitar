@@ -13,9 +13,9 @@ import (
 	"unsafe"
 )
 
-const (
-	MinimalSize = 32
-)
+const MinimalSize = 32
+
+var DefaultScale = &imaging.Linear
 
 func Render(
 	sk *skin.Skin,
@@ -23,7 +23,8 @@ func Render(
 	width, height int,
 	superSampling int,
 	helmet bool,
-	shadow, lighting bool) (result image.Image, err error) {
+	shadow, lighting bool,
+	filter *imaging.ResampleFilter) (result image.Image, err error) {
 
 	w, h := width, height
 	if superSampling > 1 {
@@ -52,7 +53,7 @@ func Render(
 
 	result = img
 	if superSampling > 1 {
-		result = imaging.Resize(result, width, height, imaging.Hermite)
+		result = imaging.Resize(result, width, height, *filter)
 	}
 
 	// The result is flipped tbh

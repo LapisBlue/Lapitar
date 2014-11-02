@@ -20,6 +20,8 @@ func runFace(name string, args []string) int {
 
 	size := flags.IntP("size", "s", faceSize, "The size of the avatar, in pixels.")
 	helm := flags.Bool("helm", false, "Render the helm as additional layer to the face")
+	scale := &scaling{face.DefaultScale}
+	flags.Var(scale, "scale", "The scaling method to use when rendering.")
 	in := flags.StringP("in", "i", input, "The source of the list of players to render. Can be either a file, STDIN or ARGS.")
 	out := flags.StringP("out", "o", output, "The destination to write the result to. Can be either a file or STDOUT.")
 
@@ -54,7 +56,7 @@ func runFace(name string, args []string) int {
 			return PrintError(err, "Failed to download skin:", player)
 		}
 
-		face := face.Render(skin, *size, *helm)
+		face := face.Render(skin, *size, *helm, scale.Get())
 
 		err = png.Encode(os.Stdout, face)
 		if err != nil {
@@ -79,7 +81,7 @@ func runFace(name string, args []string) int {
 
 		watch.Mark()
 
-		faces[i] = face.Render(skin, *size, *helm)
+		faces[i] = face.Render(skin, *size, *helm, scale.Get())
 		fmt.Println("Rendered face:", players[i], watch)
 	}
 

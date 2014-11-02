@@ -5,12 +5,30 @@ import (
 	"fmt"
 	"github.com/LapisBlue/Lapitar/skin"
 	"github.com/LapisBlue/Lapitar/util"
+	"github.com/disintegration/imaging"
 	"image"
 	"image/png"
 	"io"
 	"os"
 	"strings"
 )
+
+type scaling struct {
+	*imaging.ResampleFilter
+}
+
+func (scale *scaling) Get() *imaging.ResampleFilter {
+	return scale.ResampleFilter
+}
+
+func (scale *scaling) String() string {
+	return util.ScaleName(scale.ResampleFilter)
+}
+
+func (scale *scaling) Set(text string) (err error) {
+	scale.ResampleFilter, err = util.ParseScale(text)
+	return
+}
 
 func PrintError(err error, description ...interface{}) int {
 	if err == nil {

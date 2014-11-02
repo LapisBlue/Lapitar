@@ -8,11 +8,11 @@ import (
 	"image/draw"
 )
 
-const (
-	MinimalSize = 8
-)
+const MinimalSize = 8
 
-func Render(sk *skin.Skin, size int, helmet bool) image.Image {
+var DefaultScale = &imaging.NearestNeighbor
+
+func Render(sk *skin.Skin, size int, helmet bool, filter *imaging.ResampleFilter) image.Image {
 	face := sk.Head(skin.Front)
 	if helmet {
 		helm := sk.Helm(skin.Front)
@@ -27,5 +27,5 @@ func Render(sk *skin.Skin, size int, helmet bool) image.Image {
 		return face
 	}
 
-	return imaging.Resize(face, size, size, imaging.NearestNeighbor)
+	return imaging.Resize(face, size, size, *filter)
 }

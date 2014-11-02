@@ -26,6 +26,8 @@ func runHead(name string, args []string) int {
 	angle := flags.Float32P("angle", "a", headAngle, "The angle to render the head at, in degrees.")
 	superSampling := flags.IntP("supersampling", "s", headSuperSampling,
 		"The amount of super sampling to perform, as a multiplier to width and height.")
+	scale := &scaling{head.DefaultScale}
+	flags.Var(scale, "scale", "The scaling method to use when rendering.")
 	in := flags.StringP("in", "i", input, "The source of the list of players to render. Can be either a file, STDIN or ARGS.")
 	out := flags.StringP("out", "o", output, "The destination to write the result to. Can be either a file or STDOUT.")
 
@@ -65,7 +67,7 @@ func runHead(name string, args []string) int {
 			return PrintError(err, "Failed to download skin:", player)
 		}
 
-		head, err := head.Render(skin, *angle, *width, *height, *superSampling, !*nohelm, !*noshadow, !*nolighting)
+		head, err := head.Render(skin, *angle, *width, *height, *superSampling, !*nohelm, !*noshadow, !*nolighting, scale.Get())
 		if err != nil {
 			return PrintError(err, "Failed to render head:", player)
 		}
@@ -94,7 +96,7 @@ func runHead(name string, args []string) int {
 
 		watch.Mark()
 
-		heads[i], err = head.Render(skin, *angle, *width, *height, *superSampling, !*nohelm, !*noshadow, !*nolighting)
+		heads[i], err = head.Render(skin, *angle, *width, *height, *superSampling, !*nohelm, !*noshadow, !*nolighting, scale.Get())
 		if err != nil {
 			PrintError(err, "Failed to render head:", players[i], watch)
 			continue

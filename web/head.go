@@ -25,7 +25,7 @@ func serveHead(c web.C, w http.ResponseWriter, r *http.Request, size int) {
 	}
 
 	watch.Mark()
-	result, err := head.Render(sk, conf.Angle, size, size, conf.SuperSampling, conf.Helm, conf.Shadow, conf.Lighting)
+	result, err := head.Render(sk, conf.Angle, size, size, conf.SuperSampling, conf.Helm, conf.Shadow, conf.Lighting, conf.Scale.Get())
 	if err == nil {
 		log.Println("Rendered head:", player, watch)
 	} else {

@@ -15,11 +15,11 @@ func start(conf *config) {
 	defaults = conf
 	flag.Set("bind", conf.Address) // Uh, I guess that's a bit strange
 
-	register("/head/:size/:player", serveHeadWithSize)
 	register("/head/:player", serveHeadNormal)
+	register("/head/:size/:player", serveHeadWithSize)
 
-	register("/face/:size/:player", serveFaceWithSize)
 	register("/face/:player", serveFaceNormal)
+	register("/face/:size/:player", serveFaceWithSize)
 
 	goji.Get("/*", http.FileServer(http.Dir("www"))) // TODO: How to find the correct dir?
 

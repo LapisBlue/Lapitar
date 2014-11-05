@@ -15,6 +15,8 @@ func start(conf *config) {
 	defaults = conf
 	flag.Set("bind", conf.Address) // Uh, I guess that's a bit strange
 
+	register("/skin/:player", serveSkin)
+
 	register("/head/:player", serveHeadNormal)
 	register("/head/:size/:player", serveHeadWithSize)
 

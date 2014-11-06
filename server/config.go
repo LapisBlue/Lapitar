@@ -15,6 +15,7 @@ const (
 
 type config struct {
 	Address string      `json:"address" xml:"address"`
+	Proxy   bool        `json:"proxy" xml:"proxy"`
 	Head    *headConfig `json:"head" xml:"head"`
 	Face    *faceConfig `json:"face" xml:"face"`
 }
@@ -41,6 +42,7 @@ type limitedInt struct {
 func defaultConfig() *config {
 	return &config{
 		":8088",
+		false,
 		&headConfig{
 			&faceConfig{
 				&limitedInt{256, 512},

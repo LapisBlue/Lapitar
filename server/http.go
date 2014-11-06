@@ -3,6 +3,7 @@ package server
 import (
 	"flag"
 	"github.com/zenazn/goji"
+	"github.com/zenazn/goji/web/middleware"
 	"net/http"
 )
 
@@ -14,6 +15,9 @@ var (
 func start(conf *config) {
 	defaults = conf
 	flag.Set("bind", conf.Address) // Uh, I guess that's a bit strange
+	if conf.Proxy {
+		goji.Insert(middleware.RealIP, middleware.Logger)
+	}
 
 	register("/skin/:player", serveSkin)
 

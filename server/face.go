@@ -19,8 +19,12 @@ func serveFace(c web.C, w http.ResponseWriter, r *http.Request, size int) {
 	}
 
 	player := c.URLParams["player"]
-	sk, err := downloadSkin(player, watch)
+	sk, id, err := downloadSkin(player, watch)
 	if err != nil {
+		return
+	}
+
+	if !prepareResponse(w, r, id) {
 		return
 	}
 

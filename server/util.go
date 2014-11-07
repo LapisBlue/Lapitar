@@ -31,9 +31,9 @@ func parseSize(c web.C, def int) (result int) {
 	return
 }
 
-func downloadSkin(player string, watch *util.StopWatch) (sk *mc.Skin, err error) {
+func downloadSkin(player string, watch *util.StopWatch) (sk *mc.Skin, id string, err error) {
 	watch.Mark()
-	sk, err = cache.GetSkin(player)
+	sk, id, err = cache.GetSkin(player)
 	if err == nil {
 		log.Println("Downloaded skin:", player, watch)
 	} else {
@@ -41,6 +41,22 @@ func downloadSkin(player string, watch *util.StopWatch) (sk *mc.Skin, err error)
 	}
 
 	return
+}
+
+const (
+	cacheControl = "max-age=86400" // 24*60*60, one day in seconds
+)
+
+func prepareResponse(w http.ResponseWriter, r *http.Request, id string) bool {
+	w.Header().Add("Cache-Control", cacheControl)
+	w.Header().Add("ETag", id)
+
+	if tag := r.Header.Get("If-None-Match"); tag == id {
+		w.WriteHeader(http.StatusNotModified)
+		return false
+	}
+
+	return true
 }
 
 func sendResult(w http.ResponseWriter, player string, result image.Image, watch *util.StopWatch) (err error) {

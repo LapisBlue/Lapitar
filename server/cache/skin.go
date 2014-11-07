@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 var (
@@ -35,28 +36,45 @@ func initSkins() {
 	os.MkdirAll(skinFolder, perms)
 
 	var err error
-	steveSkin, err = GetSkin("steve")
+	steveSkin, _, err = GetSkin("steve")
 	if err != nil {
 		panic("Failed to load Steve: " + err.Error())
 	}
-	alexSkin, err = GetSkin("alex")
+	alexSkin, _, err = GetSkin("alex")
 	if err != nil {
 		panic("Failed to load Alex: " + err.Error())
 	}
 }
 
-func loadSkinCached(name string) (skin *mc.Skin, err error) {
+func loadSkinCached(name string) (skin *mc.Skin, id string, duration time.Duration, err error) {
+	id = name
+
 	if name == "steve" && steveSkin != nil {
-		return steveSkin, nil
+		skin = steveSkin
+		return
 	} else if name == "alex" && alexSkin != nil {
-		return alexSkin, nil
+		skin = alexSkin
+		return
 	}
 
-	file, err := os.Open(filepath.Join(skinFolder, name))
+	path := filepath.Join(skinFolder, name)
+
+	if target, err := os.Readlink(path); err == nil {
+		id = target
+	}
+
+	file, err := os.Open(path)
 	if err != nil {
 		return
 	}
 	defer file.Close()
+
+	stat, err := file.Stat()
+	if err != nil {
+		return
+	}
+
+	duration = time.Now().Sub(stat.ModTime())
 
 	img, err := png.Decode(file)
 	if err != nil {
@@ -87,7 +105,7 @@ func writeSkinCached(name string, player string, skin *mc.Skin) (err error) {
 }
 
 // TODO: Configurable
-func DefaultSkin() (*mc.Skin, error) {
+func DefaultSkin() (*mc.Skin, string, error) {
 	if rand.Intn(2) == 0 {
 		return GetSkin("steve")
 	} else {
@@ -95,7 +113,7 @@ func DefaultSkin() (*mc.Skin, error) {
 	}
 }
 
-func GetSkin(player string) (skin *mc.Skin, err error) {
+func GetSkin(player string) (skin *mc.Skin, id string, err error) {
 	if !mc.IsName(player) {
 		return DefaultSkin()
 	}
@@ -105,23 +123,24 @@ func GetSkin(player string) (skin *mc.Skin, err error) {
 		player = "steve"
 	}
 
-	skin, err = loadSkinCached(player)
+	skin, id, _, err = loadSkinCached(player)
 	if err == nil {
 		return
 	}
 
-	def := false
+	id = player
 
 	var url string
+	def := true
+
 	switch player {
 	case "steve":
 		url = mc.Steve
-		def = true
 	case "alex":
 		url = mc.Alex
-		def = true
 	default:
 		url = mc.SkinURL(player)
+		def = false
 	}
 
 	req, err := skinClient.Get(url)
@@ -149,7 +168,12 @@ func GetSkin(player string) (skin *mc.Skin, err error) {
 
 	if resp.StatusCode != http.StatusOK {
 		err = httputil.NewError(resp, "Expected OK, got "+resp.Status+" instead")
-		return
+		log.Println(err)
+		if def {
+			return
+		} else {
+			return DefaultSkin()
+		}
 	}
 
 	img, err := png.Decode(resp.Body)
@@ -167,6 +191,7 @@ func GetSkin(player string) (skin *mc.Skin, err error) {
 	name := player
 	if !def {
 		name = filepath.Base(resp.Request.URL.Path) // The texture ID
+		id = name
 	}
 
 	err = writeSkinCached(name, player, skin)

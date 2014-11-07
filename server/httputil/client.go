@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 )
 
@@ -68,4 +69,13 @@ func IsCancelled(err error) (ok bool) {
 	}
 
 	return
+}
+
+func NewError(resp *http.Response, err string) error {
+	method := resp.Request.Method
+	return &url.Error{
+		Op:  method[0:1] + strings.ToLower(method[1:]),
+		URL: resp.Request.URL.String(),
+		Err: errors.New(err),
+	}
 }

@@ -6,6 +6,7 @@ import (
 	"image/png"
 	"log"
 	"math/rand"
+	"net/http"
 	"os"
 	"path/filepath"
 )
@@ -145,6 +146,11 @@ func GetSkin(player string) (skin *mc.Skin, err error) {
 		}
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		err = httputil.NewError(resp, "Expected OK, got "+resp.Status+" instead")
+		return
+	}
 
 	img, err := png.Decode(resp.Body)
 	if err != nil {

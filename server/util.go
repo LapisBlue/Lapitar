@@ -10,6 +10,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 func printError(err error, message ...interface{}) {
@@ -44,11 +45,13 @@ func downloadSkin(player string, watch *util.StopWatch) (sk *mc.Skin, id string,
 }
 
 const (
+	keepCache    = 24 * time.Hour
 	cacheControl = "max-age=86400" // 24*60*60, one day in seconds
 )
 
 func prepareResponse(w http.ResponseWriter, r *http.Request, id string) bool {
 	w.Header().Add("Cache-Control", cacheControl)
+	w.Header().Add("Expires", time.Now().Add(keepCache).UTC().Format(http.TimeFormat))
 	w.Header().Add("ETag", id)
 
 	if tag := r.Header.Get("If-None-Match"); tag == id {

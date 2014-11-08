@@ -3,6 +3,7 @@ package server
 import (
 	"flag"
 	"github.com/zenazn/goji"
+	"github.com/zenazn/goji/web"
 	"github.com/zenazn/goji/web/middleware"
 	"net/http"
 )
@@ -18,6 +19,8 @@ func start(conf *config) {
 	if conf.Proxy {
 		goji.Insert(middleware.RealIP, middleware.Logger)
 	}
+
+	goji.Use(serveLapitar)
 
 	register("/skin/:player", serveSkin)
 
@@ -35,4 +38,12 @@ func start(conf *config) {
 func register(pattern string, handler interface{}) {
 	goji.Get(pattern+".png", handler)
 	goji.Get(pattern, handler)
+}
+
+func serveLapitar(c *web.C, h http.Handler) http.Handler {
+	fn := func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Server", "Lapitar") // TODO: Version
+		h.ServeHTTP(w, r)
+	}
+	return http.HandlerFunc(fn)
 }

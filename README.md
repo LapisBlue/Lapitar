@@ -1,7 +1,7 @@
 # Lapitar
 An avatar generator API thing.
 
-An mixture of C and Go. Go is used to provide the web server and the actual rendering is done with OpenGL in C and referenced using cgo from Go directly.
+Written in a mixture of C and Go. Go is used to provide the web server and the actual rendering is done with OpenGL in C and referenced using cgo from Go directly.
 
 ## Installation
 - Make sure you have at least Go 1.3 installed with a valid GOPATH, if not [install the latest version](http://golang.org/doc/install).

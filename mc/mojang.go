@@ -6,7 +6,7 @@ func IsName(name string) bool {
 	}
 
 	for _, c := range name {
-		if c < 'A' && c > 'Z' && c < 'a' && c > 'z' && c < '0' && c > '9' && c != '_' {
+		if !((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '_') {
 			return false
 		}
 	}

@@ -19,17 +19,18 @@ func serveHead(c web.C, w http.ResponseWriter, r *http.Request, size int) {
 	}
 
 	player := c.URLParams["player"]
-	sk, id, err := downloadSkin(player, watch)
-	if err != nil {
+	meta := loadSkinMeta(player, watch)
+
+	// Check if we can return 304 Not Modified
+	if serveCached(w, r, meta) {
 		return
 	}
 
-	if !prepareResponse(w, r, id) {
-		return
-	}
+	skin := downloadSkin(meta, watch)
+	prepareResponse(w, r, skin)
 
 	watch.Mark()
-	result, err := head.Render(sk, conf.Angle, size, size, conf.SuperSampling, conf.Helm, conf.Shadow, conf.Lighting, conf.Scale.Get())
+	result, err := head.Render(skin.Skin(), conf.Angle, size, size, conf.SuperSampling, conf.Helm, conf.Shadow, conf.Lighting, conf.Scale.Get())
 	if err == nil {
 		log.Println("Rendered head:", player, watch)
 	} else {

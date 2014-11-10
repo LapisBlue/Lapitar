@@ -1,7 +1,6 @@
 package server
 
 import (
-	"github.com/LapisBlue/Lapitar/mc"
 	"github.com/LapisBlue/Lapitar/server/cache"
 	"github.com/LapisBlue/Lapitar/util"
 	"github.com/zenazn/goji/web"
@@ -32,15 +31,17 @@ func parseSize(c web.C, def int) (result int) {
 	return
 }
 
-func downloadSkin(player string, watch *util.StopWatch) (sk *mc.Skin, id string, err error) {
+func loadSkinMeta(player string, watch *util.StopWatch) (meta cache.Meta) {
 	watch.Mark()
-	sk, id, err = cache.GetSkin(player)
-	if err == nil {
-		log.Println("Downloaded skin:", player, watch)
-	} else {
-		printError(err, "Failed to download skin:", player, watch)
-	}
+	meta = cache.GetSkin(player)
+	log.Println("Loaded skin meta:", player, watch)
+	return
+}
 
+func downloadSkin(meta cache.Meta, watch *util.StopWatch) (skin cache.Skin) {
+	watch.Mark()
+	skin = meta.Load()
+	log.Println("Loaded skin:", skin.Name(), watch)
 	return
 }
 
@@ -49,17 +50,21 @@ const (
 	cacheControl = "max-age=86400" // 24*60*60, one day in seconds
 )
 
-func prepareResponse(w http.ResponseWriter, r *http.Request, id string) bool {
-	w.Header().Add("Cache-Control", cacheControl)
-	w.Header().Add("Expires", time.Now().Add(keepCache).UTC().Format(http.TimeFormat))
-	w.Header().Add("ETag", id)
-
-	if tag := r.Header.Get("If-None-Match"); tag == id {
+func serveCached(w http.ResponseWriter, r *http.Request, meta cache.Meta) bool {
+	if tag := r.Header.Get("If-None-Match"); tag == meta.ID() {
+		prepareResponse(w, r, meta)
 		w.WriteHeader(http.StatusNotModified)
-		return false
+		return true
 	}
 
-	return true
+	return false
+}
+
+func prepareResponse(w http.ResponseWriter, r *http.Request, meta cache.Meta) {
+	w.Header().Add("Cache-Control", cacheControl)
+	w.Header().Add("Expires", time.Now().Add(keepCache).UTC().Format(http.TimeFormat))
+	w.Header().Add("ETag", meta.ID())
+	w.Header().Add("Last-Modified", meta.LastMod().UTC().Format(http.TimeFormat))
 }
 
 func sendResult(w http.ResponseWriter, player string, result image.Image, watch *util.StopWatch) (err error) {

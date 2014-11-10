@@ -4,6 +4,7 @@ import (
 	"github.com/LapisBlue/Lapitar/mc"
 	"github.com/LapisBlue/Lapitar/server/httputil"
 	"image/png"
+	"io"
 	"log"
 	"math/rand"
 	"net/http"
@@ -14,190 +15,330 @@ import (
 
 var (
 	skinFolder string
-	skinClient = httputil.Client()
-	steveSkin  *mc.Skin
-	alexSkin   *mc.Skin
-)
+	SteveSkin  Skin
+	AlexSkin   Skin
 
-func init() {
-	/*skinClient.RedirectHandler = func(req *http.Request, via []*http.Request) bool {
-		if req.Host == "textures.minecraft.net" {
-			hash := filepath.Base(req.URL.Path)
-			if _, err := os.Stat(filepath.Join(skinFolder, hash)); err == nil {
-				return false // We have this skin already
-			}
-		}
-		return false
-	}// TODO: do I need this*/
-}
+	textureServer = "textures.minecraft.net"
+	textureURL    = "http://" + textureServer + "/texture/"
+)
 
 func initSkins() {
 	skinFolder = filepath.Join(cacheFolder, "skins")
-	os.MkdirAll(skinFolder, perms)
+	os.MkdirAll(skinFolder, os.ModePerm)
+
+	SteveSkin = GetSkin("steve").Load()
+	AlexSkin = GetSkin("alex").Load()
+}
+
+// Basic information about a cached skin
+type Meta interface {
+	Name() string
+	ID() string
+	LastMod() time.Time
+	Load() Skin
+}
+
+// A downloaded skin
+type Skin interface {
+	Meta
+	Skin() *mc.Skin
+}
+
+type skinSource struct {
+	skinMeta
+	path *string
+	req  *http.Request
+}
+
+func (skin *skinSource) Load() (resultSkin Skin) {
+	def := false
+	switch skin.id {
+	case "steve":
+		if SteveSkin != nil {
+			return SteveSkin
+		}
+
+		def = true // We still need to load Steve
+	case "alex":
+		if AlexSkin != nil {
+			return AlexSkin
+		}
+
+		def = true // We still need to load Alex
+	}
+
+	result := &localSkin{skinMeta: skin.skinMeta}
+	resultSkin = result
 
 	var err error
-	steveSkin, _, err = GetSkin("steve")
+	defer func() { // Error handler
+		if err != nil {
+			if def {
+				panic(err)
+			}
+
+			defSkin := DefaultSkin()
+			result.id = defSkin.ID()
+			result.skin = defSkin.Skin()
+		}
+	}()
+
+	var in io.ReadCloser
+
+	if skin.path != nil {
+		// We have this skin loaded on the disk
+		in, err = os.Open(*skin.path)
+		if err != nil {
+			in = nil // I'm not sure why I need this but it is not working if I don't do this
+
+			if !os.IsNotExist(err) {
+				log.Println(err)
+				return
+			}
+
+			// We know which skin ID to download, but we haven't downloaded it yet
+			if skin.req == nil { // This is not nil if we're downloading the default skins
+				skin.req, err = httputil.Get(textureURL + skin.id)
+				if err != nil {
+					return
+				}
+				prepareSkinRequest(skin.req)
+			}
+		} else {
+			defer in.Close()
+		}
+	}
+
+	if skin.req != nil && in == nil {
+		// Send the request and download the skin from the server
+		resp, err := httputil.Do(skin.req)
+		if err != nil {
+			return
+		}
+		in = resp.Body
+		defer in.Close()
+
+		// Check if status code was successful
+		if !httputil.IsSuccess(resp) {
+			err = httputil.NewError(resp, "Expected OK, got "+resp.Status+" instead")
+			return
+		}
+
+		// Check if response is really a PNG image
+		if respType := resp.Header.Get("Content-Type"); respType != "image/png" {
+			err = httputil.NewError(resp, "Expected content type image/png, got "+respType+" instead")
+			return
+		}
+
+		defer func() {
+			// If nothing bad happened we still need to save the skin to the cache
+			if err == nil {
+				file, err := os.Create(filepath.Join(skinFolder, skin.id))
+				if err != nil {
+					log.Println(err)
+					return
+				}
+				defer file.Close()
+
+				err = png.Encode(file, result.skin.Image())
+				if err != nil {
+					log.Println(err)
+				}
+			}
+		}()
+	}
+
+	if in == nil {
+		panic("Invalid skin meta")
+	}
+
+	// Decode the PNG image
+	img, err := png.Decode(in)
 	if err != nil {
-		panic("Failed to load Steve: " + err.Error())
-	}
-	alexSkin, _, err = GetSkin("alex")
-	if err != nil {
-		panic("Failed to load Alex: " + err.Error())
-	}
-}
-
-func loadSkinCached(name string) (skin *mc.Skin, id string, duration time.Duration, err error) {
-	id = name
-
-	if name == "steve" && steveSkin != nil {
-		skin = steveSkin
-		return
-	} else if name == "alex" && alexSkin != nil {
-		skin = alexSkin
 		return
 	}
 
-	path := filepath.Join(skinFolder, name)
-
-	if target, err := os.Readlink(path); err == nil {
-		id = target
-	}
-
-	file, err := os.Open(path)
-	if err != nil {
-		return
-	}
-	defer file.Close()
-
-	stat, err := file.Stat()
-	if err != nil {
-		return
-	}
-
-	duration = time.Now().Sub(stat.ModTime())
-
-	img, err := png.Decode(file)
-	if err != nil {
-		return
-	}
-
-	skin = mc.CreateSkin(img)
+	result.skin = mc.CreateSkin(img)
 	return
 }
 
-func writeSkinCached(name string, player string, skin *mc.Skin) (err error) {
-	file, err := os.Create(filepath.Join(skinFolder, name))
-	if err != nil {
-		return
-	}
-	defer file.Close()
-
-	err = png.Encode(file, skin.Image())
-	if err != nil {
-		return
-	}
-
-	if name != player {
-		err = os.Symlink(name, filepath.Join(skinFolder, player))
-	}
-
-	return
-}
-
-// TODO: Configurable
-func DefaultSkin() (*mc.Skin, string, error) {
+func DefaultSkin() Skin {
 	if rand.Intn(2) == 0 {
-		return GetSkin("steve")
+		return SteveSkin
 	} else {
-		return GetSkin("alex")
+		return AlexSkin
 	}
 }
 
-func GetSkin(player string) (skin *mc.Skin, id string, err error) {
-	if !mc.IsName(player) {
+func GetSkin(name string) Meta {
+	if !mc.IsName(name) {
 		return DefaultSkin()
 	}
 
-	player = mc.ToLower(player)
-	if player == "char" { // Alias for Steve
-		player = "steve"
+	name = mc.ToLower(name)
+	meta := new(skinSource)
+	meta.name = name
+
+	switch name {
+	case "steve", "char":
+		// Maybe we need to load steve first
+		if SteveSkin == nil {
+			return getDefault(meta, "steve", mc.Steve)
+		}
+
+		return SteveSkin
+	case "alex":
+		// Maybe we need to load steve first
+		if AlexSkin == nil {
+			return getDefault(meta, "alex", mc.Alex)
+		}
+
+		return AlexSkin
 	}
 
-	skin, id, _, err = loadSkinCached(player)
+	// Check if the skin is cached on disk
+	err := loadCachedMeta(meta)
 	if err == nil {
+		return meta
+	} else if !os.IsNotExist(err) {
+		log.Println(err)
+	}
+
+	// We don't have this skin in memory, we need to query the Mojang server about the skin
+	err = querySkinMeta(meta)
+	if err != nil {
+		log.Println(err)
+
+		// Assign the default skin to the name
+		def := DefaultSkin()
+
+		skin := &localSkin{skinMeta: meta.skinMeta}
+
+		skin.id = def.Name()
+		skin.lastMod = time.Now()
+		skin.skin = def.Skin()
+		linkSkinMeta(skin)
+		return skin
+	}
+
+	return meta
+}
+
+func getDefault(meta *skinSource, name string, source string) Meta {
+	meta.name = name
+	meta.id = name
+
+	err := loadDefaultMeta(meta)
+	if err != nil {
+		if os.IsNotExist(err) {
+			log.Println(name + " not found, downloading...")
+		} else {
+			log.Println(err)
+		}
+	}
+
+	meta.req, err = httputil.Get(source)
+	if err != nil {
+		panic(err)
+	}
+
+	prepareSkinRequest(meta.req)
+	return meta
+}
+
+func loadDefaultMeta(meta *skinSource) (err error) {
+	path := filepath.Join(skinFolder, meta.name)
+	stat, err := os.Stat(path)
+	if err != nil {
 		return
 	}
 
-	id = player
-
-	var url string
-	def := true
-
-	switch player {
-	case "steve":
-		url = mc.Steve
-	case "alex":
-		url = mc.Alex
-	default:
-		url = mc.SkinURL(player)
-		def = false
-	}
-
-	req, err := skinClient.Get(url)
-	if err != nil {
-		log.Println(err)
-		if def {
-			return
-		} else {
-			return DefaultSkin()
-		}
-	}
-
-	req.Header.Set("Accept", "image/png")
-
-	resp, err := skinClient.Do(req)
-	if err != nil {
-		log.Println(err)
-		if def {
-			return
-		} else {
-			return DefaultSkin()
-		}
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		err = httputil.NewError(resp, "Expected OK, got "+resp.Status+" instead")
-		log.Println(err)
-		if def {
-			return
-		} else {
-			return DefaultSkin()
-		}
-	}
-
-	img, err := png.Decode(resp.Body)
-	if err != nil {
-		log.Println(err)
-		if def {
-			return
-		} else {
-			return DefaultSkin()
-		}
-	}
-
-	skin = mc.CreateSkin(img)
-
-	name := player
-	if !def {
-		name = filepath.Base(resp.Request.URL.Path) // The texture ID
-		id = name
-	}
-
-	err = writeSkinCached(name, player, skin)
-	if err != nil {
-		log.Println(err)
-	}
-
+	meta.lastMod = stat.ModTime()
+	meta.path = &path
 	return
+}
+
+func loadCachedMeta(meta *skinSource) (err error) {
+	path := filepath.Join(skinFolder, meta.name)
+	stat, err := os.Lstat(path)
+	if err != nil {
+		return
+	}
+
+	target, err := os.Readlink(path)
+	if err != nil {
+		return
+	}
+
+	meta.lastMod = stat.ModTime()
+	meta.id = filepath.Base(target)
+	meta.path = &target
+	return
+}
+
+func prepareSkinRequest(req *http.Request) {
+	// We only accept PNG images as response
+	req.Header.Set("Accept", "image/png")
+}
+
+func querySkinMeta(meta *skinSource) (err error) {
+	req, err := httputil.Get(mc.SkinURL(meta.name))
+	if err != nil {
+		return
+	}
+
+	prepareSkinRequest(req)
+
+	// Try to get the skin ID from textures.minecraft.net
+	loc, err := httputil.GetLocation(req, textureServer)
+	if err != nil {
+		return
+	}
+
+	meta.lastMod = time.Now()
+	meta.id = filepath.Base(loc.URL.Path)
+	meta.req = loc
+
+	// Now that we have the skin ID we still need to create the symlink for future use
+	linkSkinMeta(meta)
+	return
+}
+
+func linkSkinMeta(meta Meta) {
+	if err := os.Symlink(meta.ID(), filepath.Join(skinFolder, meta.Name())); err != nil {
+		log.Println(err)
+	}
+}
+
+// struct implementation
+
+type skinMeta struct {
+	name    string
+	id      string
+	lastMod time.Time
+}
+
+func (meta skinMeta) Name() string {
+	return meta.name
+}
+
+func (meta skinMeta) ID() string {
+	return meta.id
+}
+
+func (meta skinMeta) LastMod() time.Time {
+	return meta.lastMod
+}
+
+type localSkin struct {
+	skinMeta
+	skin *mc.Skin
+}
+
+func (skin *localSkin) Load() Skin {
+	return skin
+}
+
+func (skin *localSkin) Skin() *mc.Skin {
+	return skin.skin
 }

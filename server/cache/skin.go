@@ -3,6 +3,7 @@ package cache
 import (
 	"github.com/LapisBlue/Lapitar/mc"
 	"github.com/LapisBlue/Lapitar/server/httputil"
+	"github.com/LapisBlue/Lapitar/util"
 	"image/png"
 	"io"
 	"log"
@@ -11,6 +12,10 @@ import (
 	"os"
 	"path/filepath"
 	"time"
+)
+
+const (
+	updateInterval = 24 * time.Hour
 )
 
 var (
@@ -199,6 +204,29 @@ func GetSkin(name string) Meta {
 	// Check if the skin is cached on disk
 	err := loadCachedMeta(meta)
 	if err == nil {
+		// Check if we need to update the skin
+		if time.Now().Sub(meta.LastMod()) > updateInterval {
+			update := new(skinSource)
+			*update = *meta
+			go func() {
+				watch := util.StartedWatch()
+				querySkinMeta(update)
+				if meta.id != update.id {
+					// The skin is outdated, we need to update it
+					updateSkinMeta(meta)
+					// Delete the old skin
+					err := os.Remove(*meta.path)
+					if err != nil {
+						log.Println(err)
+					}
+				} else {
+					updateSkinMeta(meta)
+				}
+
+				log.Println("Checked for skin update:", meta.name, watch)
+			}()
+		}
+
 		return meta
 	} else if !os.IsNotExist(err) {
 		log.Println(err)
@@ -206,7 +234,9 @@ func GetSkin(name string) Meta {
 
 	// We don't have this skin in memory, we need to query the Mojang server about the skin
 	err = querySkinMeta(meta)
-	if err != nil {
+	if err == nil {
+		linkSkinMeta(meta)
+	} else {
 		log.Println(err)
 
 		// Assign the default skin to the name
@@ -295,12 +325,8 @@ func querySkinMeta(meta *skinSource) (err error) {
 		return
 	}
 
-	meta.lastMod = time.Now()
 	meta.id = filepath.Base(loc.URL.Path)
 	meta.req = loc
-
-	// Now that we have the skin ID we still need to create the symlink for future use
-	linkSkinMeta(meta)
 	return
 }
 
@@ -308,6 +334,16 @@ func linkSkinMeta(meta Meta) {
 	if err := os.Symlink(meta.ID(), filepath.Join(skinFolder, meta.Name())); err != nil {
 		log.Println(err)
 	}
+}
+
+func updateSkinMeta(meta Meta) {
+	link := filepath.Join(skinFolder, meta.Name())
+	err := os.Remove(link)
+	if err != nil {
+		log.Println(err)
+	}
+
+	linkSkinMeta(meta)
 }
 
 // struct implementation

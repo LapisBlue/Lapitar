@@ -24,8 +24,8 @@ func start(conf *config) {
 
 	register("/skin/:player", serveSkin)
 
-	register("/head/:player", serveHeadNormal)
-	register("/head/:size/:player", serveHeadWithSize)
+	register("/avatar/:player", serveHeadNormal)
+	register("/avatar/:size/:player", serveHeadWithSize)
 
 	register("/face/:player", serveFaceNormal)
 	register("/face/:size/:player", serveFaceWithSize)

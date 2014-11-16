@@ -45,7 +45,7 @@ func defaultConfig() *config {
 		false,
 		&headConfig{
 			&faceConfig{
-				&limitedInt{256, 512},
+				&limitedInt{128, 512},
 				true,
 				&scaling{head.DefaultScale},
 			},
@@ -54,7 +54,7 @@ func defaultConfig() *config {
 			true,
 			true,
 		}, &faceConfig{
-			&limitedInt{256, 512},
+			&limitedInt{128, 512},
 			false,
 			&scaling{face.DefaultScale},
 		},

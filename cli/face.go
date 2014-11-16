@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	faceSize = 256
+	faceSize = 128
 )
 
 func runFace(name string, args []string) int {

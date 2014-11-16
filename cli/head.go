@@ -12,8 +12,8 @@ import (
 )
 
 const (
-	headWidth         = 256
-	headHeight        = 256
+	headWidth         = 128
+	headHeight        = 128
 	headAngle         = 45
 	headSuperSampling = 4
 )

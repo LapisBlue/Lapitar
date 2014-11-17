@@ -121,12 +121,14 @@ void setup_shadow(float angle) {
     glPushMatrix();
     glTranslatef(0.0f, -0.95f, -0.45f);
 
-    const GLfloat count = 10.0f;
+    GLfloat scale = 1.02f;
+    const GLfloat count = 10;
     GLfloat i;
     for (i = 0; i < count; i++) {
-        glTranslatef(0.0f, -0.01f, 0.0f);
-        glColor4f(0.0f, 0.0f, 0.0f, (1.0f - (i / count)) / 2.0f);
-        draw(1.02f, 0.01f, 1.02f, angle);
+        scale += 0.01f;
+        glTranslatef(0.0f, -0.001f, 0.0f);
+        glColor4f(0.0f, 0.0f, 0.0f, (1.0f-(i/(float)count))/2.0f);
+        draw(scale, 0.01f, scale, angle);
     }
 
     glPopMatrix();

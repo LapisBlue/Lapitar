@@ -1,19 +1,24 @@
 package blue.lapis.tar;
 
-import com.google.common.base.MoreObjects;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
+
 import org.lwjgl.BufferUtils;
+import org.lwjgl.LWJGLException;
+import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.Pbuffer;
 import org.lwjgl.opengl.PixelFormat;
 import org.lwjgl.util.glu.GLU;
 
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
+import com.google.common.base.MoreObjects;
 
 public class TarRenderer {
-	private final float angle;
+	private float angle;
 	private final int width, height, finalWidth, finalHeight;
 	private final int superSampling;
 
@@ -21,11 +26,15 @@ public class TarRenderer {
 	private final boolean shadow;
 	private final boolean lighting;
 
+	private final boolean useWindow;
+	
 	private Pbuffer buffer;
 	private FloatBuffer lightPosition;
 	private FloatBuffer lightAmbient;
+	
+	private boolean initialized = false;
 
-	public TarRenderer(float angle, int width, int height, int superSampling, boolean helmet, boolean shadow, boolean lighting) {
+	public TarRenderer(float angle, int width, int height, int superSampling, boolean helmet, boolean shadow, boolean lighting, boolean useWindow) {
 		this.angle = angle;
 		this.width = width * superSampling;
 		this.finalWidth = width;
@@ -35,12 +44,16 @@ public class TarRenderer {
 		this.helmet = helmet;
 		this.shadow = shadow;
 		this.lighting = lighting;
+		this.useWindow = useWindow;
 	}
 
 	public BufferedImage render(BufferedImage skin) throws Exception {
 		init();
 		BufferedImage head = skin.getSubimage(0, 0, 32, 16);
 		BufferedImage helm = skin.getSubimage(32, 0, 32, 16);
+		if (useWindow) {
+			GL11.glClearColor(1, 1, 1, 1);
+		}
 		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 		lightPosition = BufferUtils.createFloatBuffer(4);
 		lightPosition.mark();
@@ -65,14 +78,17 @@ public class TarRenderer {
 		if (shadow) {
 			GL11.glEnable(GL11.GL_BLEND);
 			GL11.glDisable(GL11.GL_TEXTURE_2D);
+			GL11.glDisable(GL11.GL_LIGHTING);
 			GL11.glPushMatrix();
-			GL11.glTranslatef(0f, -0.95f, -0.45f);
-			int count = 10;
-			for (int i = 0; i < count; i++) {
-				GL11.glTranslatef(0f, -0.01f, 0f);
-				GL11.glColor4f(0, 0, 0, (1-(i/(float)count))/2f);
-				draw(1.02f, 0.01f, 1.02f);
-			}
+				GL11.glTranslatef(0f, -0.95f, -0.45f);
+				float scale = 1.02f;
+				int count = 10;
+				for (int i = 0; i < count; i++) {
+					scale += 0.01f;
+					GL11.glTranslatef(0f, -0.001f, 0f);
+					GL11.glColor4f(0, 0, 0, (1-(i/(float)count))/2f);
+					draw(scale, 0.01f, scale);
+				}
 			GL11.glPopMatrix();
 		}
 
@@ -91,13 +107,17 @@ public class TarRenderer {
 			draw(1.05f, 1.05f, 1.05f);
 		}
 
-		BufferedImage img = readPixels();
-		BufferedImage out = new BufferedImage(finalWidth, finalHeight, BufferedImage.TYPE_INT_ARGB);
-		Graphics2D gout = out.createGraphics();
-		gout.drawImage(img.getScaledInstance(finalWidth, finalHeight, Image.SCALE_SMOOTH), 0, 0, null);
-		gout.dispose();
-		cleanup();
-		return out;
+		if (useWindow) {
+			return null;
+		} else {
+			BufferedImage img = readPixels();
+			BufferedImage out = new BufferedImage(finalWidth, finalHeight, BufferedImage.TYPE_INT_ARGB);
+			Graphics2D gout = out.createGraphics();
+			gout.drawImage(img.getScaledInstance(finalWidth, finalHeight, Image.SCALE_SMOOTH), 0, 0, null);
+			gout.dispose();
+			cleanup();
+			return out;
+		}
 	}
 
 	private BufferedImage readPixels() {
@@ -190,9 +210,29 @@ public class TarRenderer {
 			System.exit(2);
 		}
 	}
+	
+	private void createWindow() {
+		try {
+			Display.setFullscreen(false);
+			Display.setTitle("Lapitar");
+			Display.setDisplayMode(new DisplayMode(width, height));
+			Display.create();
+		} catch (LWJGLException e) {
+			cleanup();
+			System.err.println("Failed to set up Display.");
+			System.exit(2);
+		}
+	}
+	
 	private void init() throws Exception {
-		createBuffer();
+		if (initialized) return;
+		if (useWindow) {
+			createWindow();
+		} else {
+			createBuffer();
+		}
 		initGL();
+		initialized = true;
 	}
 
 	private void initGL() {
@@ -216,7 +256,11 @@ public class TarRenderer {
 	}
 
 	private void cleanup() {
-		buffer.destroy();
+		if (useWindow) {
+			Display.destroy();
+		} else {
+			buffer.destroy();
+		}
 	}
 
 	@Override
@@ -230,5 +274,9 @@ public class TarRenderer {
 				.add("shadow", shadow)
 				.add("lighting", lighting)
 				.toString();
+	}
+
+	public void incrementAngle() {
+		angle += 0.5f;
 	}
 }

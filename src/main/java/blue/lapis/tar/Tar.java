@@ -1,12 +1,7 @@
 package blue.lapis.tar;
 
-import com.google.common.base.Stopwatch;
-import joptsimple.OptionException;
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
-import joptsimple.OptionSpec;
+import static java.util.Arrays.asList;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -14,7 +9,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static java.util.Arrays.asList;
+import javax.imageio.ImageIO;
+
+import joptsimple.OptionException;
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
+import joptsimple.OptionSpec;
+
+import org.lwjgl.opengl.Display;
+
+import com.google.common.base.Stopwatch;
 
 public final class Tar {
 	private static final float DEFAULT_ANGLE = 45;
@@ -39,6 +43,8 @@ public final class Tar {
 
 		OptionSpec<Integer> superSampling = parser.acceptsAll(asList("supersampling", "s"), "The amount of super sampling to perform, as a multiplier to width and height.")
 				.withRequiredArg().ofType(Integer.class).defaultsTo(4);
+		
+		parser.acceptsAll(asList("continuous"), "Continuously render a head in a window. Intended for debugging. Doesn't work properly with supersampling.");
 
 		parser.accepts("no-helm", "Don't render the helm of the skin.");
 		parser.accepts("no-shadow", "Don't render the shadow.");
@@ -64,6 +70,7 @@ public final class Tar {
 			}
 		} else {
 			boolean stdout = options.has("stdout");
+			boolean continuous = options.has("continuous");
 			Stopwatch watch = Stopwatch.createUnstarted();
 
 			System.err.println("Initializing renderer...");
@@ -75,7 +82,8 @@ public final class Tar {
 					options.valueOf(superSampling),
 					!options.has("no-helm"),
 					!options.has("no-shadow"),
-					!options.has("no-lighting")
+					!options.has("no-lighting"),
+					continuous
 			);
 			watch.stop();
 			System.err.println("Initialized renderer in " + Time.format(watch));
@@ -134,54 +142,84 @@ public final class Tar {
 			System.err.println("Rendering skins...");
 			Map<SkinSource, BufferedImage> results = new LinkedHashMap<>(skins.size());
 
-			time = 0;
-			for (Map.Entry<SkinSource, BufferedImage> job : skins.entrySet()) {
-				SkinSource source = job.getKey();
-				BufferedImage skin = job.getValue();
-
-				watch.start();
-				try {
-					results.put(source, renderer.render(skin));
-				} catch (Exception e) {
+			boolean go = true;
+			int fpsCounter = 0;
+			int fps = 0;
+			long lastFrameUpdate = 0;
+			while (go) {
+				time = 0;
+				for (Map.Entry<SkinSource, BufferedImage> job : skins.entrySet()) {
+					SkinSource source = job.getKey();
+					BufferedImage skin = job.getValue();
+	
+					watch.start();
+					try {
+						results.put(source, renderer.render(skin));
+					} catch (Exception e) {
+						watch.stop();
+						System.err.println("Failed to render skin for " + source + " (" + Time.format(watch) + ")");
+						e.printStackTrace();
+						watch.reset();
+						continue;
+					}
 					watch.stop();
-					System.err.println("Failed to render skin for " + source + " (" + Time.format(watch) + ")");
-					e.printStackTrace();
+					if (!continuous) {
+						System.err.println("Rendered skin: " + source + " (" + Time.format(watch) + ")");
+					}
+					time += watch.elapsed(TimeUnit.NANOSECONDS);
 					watch.reset();
-					continue;
 				}
-				watch.stop();
-				System.err.println("Rendered skin: " + source + " (" + Time.format(watch) + ")");
-				time += watch.elapsed(TimeUnit.NANOSECONDS);
-				watch.reset();
+				if (!continuous) {
+					System.err.println("Finished rendering skins, took " + Time.format(time));
+				}
+				if (continuous) {
+					while (!Display.isCreated()) { try { Thread.sleep(10L); } catch (InterruptedException e) {} }
+					if (Display.isCloseRequested()) {
+						go = false;
+					}
+					fpsCounter++;
+					if (System.currentTimeMillis() - lastFrameUpdate >= 1000) {
+						fps = fpsCounter;
+						fpsCounter = 0;
+						lastFrameUpdate = System.currentTimeMillis();
+					}
+					renderer.incrementAngle();
+					Display.setTitle("Lapitar - "+fps+"/30 fps");
+					Display.update();
+					Display.sync(30);
+				} else {
+					go = false;
+				}
 			}
-			System.err.println("Finished rendering skins, took " + Time.format(time));
 
 			System.err.println();
 
-			System.err.println("Saving results...");
-			Output out = options.valueOf(output);
-			time = 0;
-			for (Map.Entry<SkinSource, BufferedImage> result : results.entrySet()) {
-				SkinSource source = result.getKey();
-				BufferedImage skin = result.getValue();
-
-				watch.start();
-				try {
-					out.write(source, skin);
-				} catch (IOException e) {
+			if (!continuous) {
+				System.err.println("Saving results...");
+				Output out = options.valueOf(output);
+				time = 0;
+				for (Map.Entry<SkinSource, BufferedImage> result : results.entrySet()) {
+					SkinSource source = result.getKey();
+					BufferedImage skin = result.getValue();
+	
+					watch.start();
+					try {
+						out.write(source, skin);
+					} catch (IOException e) {
+						watch.stop();
+						System.err.println("Failed to save result for " + source + " (" + Time.format(watch) + ")");
+						e.printStackTrace();
+						watch.reset();
+						continue;
+					}
 					watch.stop();
-					System.err.println("Failed to save result for " + source + " (" + Time.format(watch) + ")");
-					e.printStackTrace();
+					System.err.println("Saved result: " + source + " (" + Time.format(watch) + ")");
+					time += watch.elapsed(TimeUnit.NANOSECONDS);
 					watch.reset();
-					continue;
 				}
-				watch.stop();
-				System.err.println("Saved result: " + source + " (" + Time.format(watch) + ")");
-				time += watch.elapsed(TimeUnit.NANOSECONDS);
-				watch.reset();
+				System.err.println("Finished saving results, took " + Time.format(time));
 			}
-			System.err.println("Finished saving results, took " + Time.format(time));
-
+			
 			System.err.println();
 
 			System.err.println("Done!");

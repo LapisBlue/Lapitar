@@ -1,11 +1,12 @@
 package blue.lapis.tar;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+
+import javax.imageio.ImageIO;
 
 public enum Output {
 	STDOUT {

@@ -18,13 +18,28 @@ import org.lwjgl.util.glu.GLU;
 import com.google.common.base.MoreObjects;
 
 public class TarRenderer {
+	private static final int HEAD_TEXTURE = 1;
+	private static final int HEAD2_TEXTURE = 2;
+	
+	private static final int TORSO_TEXTURE = 3;
+	private static final int TORSO2_TEXTURE = 4;
+	
+	private static final int LEFTARM_TEXTURE = 5;
+	private static final int LEFTARM2_TEXTURE = 6;
+	
+	private static final int RIGHTARM_TEXTURE = 7;
+	private static final int RIGHTARM2_TEXTURE = 8;
+	
 	private float angle;
+	private float tilt;
+	
 	private final int width, height, finalWidth, finalHeight;
 	private final int superSampling;
-
+	
 	private final boolean helmet;
 	private final boolean shadow;
 	private final boolean lighting;
+	private final boolean portrait;
 
 	private final boolean useWindow;
 	
@@ -34,27 +49,32 @@ public class TarRenderer {
 	
 	private boolean initialized = false;
 
-	public TarRenderer(float angle, int width, int height, int superSampling, boolean helmet, boolean shadow, boolean lighting, boolean useWindow) {
+	public TarRenderer(float angle, float tilt, // Angles
+						int width, int height, int superSampling, // Size
+						boolean helmet, boolean shadow, boolean lighting, // Flags A
+						boolean portrait, boolean useWindow) { // Flags B
 		this.angle = angle;
+		this.tilt = tilt;
 		this.width = width * superSampling;
 		this.finalWidth = width;
 		this.height = height * superSampling;
 		this.finalHeight = height;
 		this.superSampling = superSampling;
 		this.helmet = helmet;
-		this.shadow = shadow;
+		this.shadow = shadow && !portrait;
 		this.lighting = lighting;
 		this.useWindow = useWindow;
+		this.portrait = portrait;
 	}
 
 	public BufferedImage render(BufferedImage skin) throws Exception {
 		init();
-		BufferedImage head = skin.getSubimage(0, 0, 32, 16);
-		BufferedImage helm = skin.getSubimage(32, 0, 32, 16);
 		if (useWindow) {
 			GL11.glClearColor(1, 1, 1, 1);
 		}
 		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
+		GL11.glPushMatrix();
+		GL11.glCullFace(GL11.GL_BACK);
 		lightPosition = BufferUtils.createFloatBuffer(4);
 		lightPosition.mark();
 		lightPosition.put(-4f);
@@ -70,13 +90,21 @@ public class TarRenderer {
 		lightAmbient.put(3.0f);
 		lightAmbient.put(1f);
 		lightAmbient.reset();
-		upload(head, 1);
+		upload(skin.getSubimage(0, 0, 32, 16), HEAD_TEXTURE);
 		if (helmet) {
-			upload(helm, 2);
+			upload(skin.getSubimage(32, 0, 32, 16), HEAD2_TEXTURE);
+		}
+		if (portrait) {
+			upload(skin.getSubimage(16, 16, 24, 16), TORSO_TEXTURE);
+			/*upload(body2, TORSO2_TEXTURE);
+			upload(larm, LEFTARM_TEXTURE);
+			upload(larm, LEFTARM2_TEXTURE);
+			upload(rarm2, RIGHTARM_TEXTURE);
+			upload(rarm2, RIGHTARM2_TEXTURE);*/
 		}
 
+		GL11.glEnable(GL11.GL_BLEND);
 		if (shadow) {
-			GL11.glEnable(GL11.GL_BLEND);
 			GL11.glDisable(GL11.GL_TEXTURE_2D);
 			GL11.glDisable(GL11.GL_LIGHTING);
 			GL11.glPushMatrix();
@@ -87,26 +115,43 @@ public class TarRenderer {
 					scale += 0.01f;
 					GL11.glTranslatef(0f, -0.001f, 0f);
 					GL11.glColor4f(0, 0, 0, (1-(i/(float)count))/2f);
-					draw(scale, 0.01f, scale);
+					draw(scale, 0.01f, scale, TextureType.NONE);
 				}
 			GL11.glPopMatrix();
 		}
 
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		if (lighting) {
 			GL11.glEnable(GL11.GL_LIGHTING);
 			GL11.glEnable(GL11.GL_LIGHT0);
 		}
-
+		if (portrait) {
+			GL11.glTranslatef(0,0,-8.5f);
+		} else {
+			GL11.glTranslatef(0,0,-4.5f);
+		}
+		GL11.glRotatef(tilt,1.0f,0f,0.0f);
+		GL11.glRotatef(angle,0f,1.0f,0f);
+		GL11.glLight(GL11.GL_LIGHT0, GL11.GL_POSITION, lightPosition);
+		GL11.glLight(GL11.GL_LIGHT0, GL11.GL_AMBIENT, lightAmbient);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glColor3f(1, 1, 1);
-		GL11.glBindTexture(GL11.GL_TEXTURE_2D, 1);
-		draw(1.0f, 1.0f, 1.0f);
+		if (portrait) {
+			GL11.glPushMatrix();
+			GL11.glBindTexture(GL11.GL_TEXTURE_2D, TORSO_TEXTURE);
+			GL11.glTranslatef(0f, -2.5f, 0f);
+			draw(1.0f, 1.5f, 0.5f, TextureType.TORSO);
+			GL11.glPopMatrix();
+		}
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, HEAD_TEXTURE);
+		draw(1.0f, 1.0f, 1.0f, TextureType.HEAD);
 		if (helmet) {
-			GL11.glBindTexture(GL11.GL_TEXTURE_2D, 2);
-			draw(1.05f, 1.05f, 1.05f);
+			GL11.glBindTexture(GL11.GL_TEXTURE_2D, HEAD2_TEXTURE);
+			draw(1.05f, 1.05f, 1.05f, TextureType.HEAD);
 		}
 
+		GL11.glPopMatrix();
 		if (useWindow) {
 			return null;
 		} else {
@@ -138,45 +183,40 @@ public class TarRenderer {
 		}
 		return img;
 	}
-	private void draw(float xScale, float yScale, float zScale) throws Exception {
+	private void draw(float xScale, float yScale, float zScale, TextureType type) throws Exception {
 		GL11.glPushMatrix();
-		GL11.glRotatef(20,1.0f,0f,0.0f);
-		GL11.glTranslatef(0,-1.5f,-4.5f);
-		GL11.glRotatef(angle,0f,1.0f,0f);
-		GL11.glLight(GL11.GL_LIGHT0, GL11.GL_POSITION, lightPosition);
-		GL11.glLight(GL11.GL_LIGHT0, GL11.GL_AMBIENT, lightAmbient);
 		GL11.glBegin(GL11.GL_QUADS);
 		GL11.glNormal3f(0, 0, -1f);
 		// Front
-		GL11.glTexCoord2f( 0.25f, 1.00f ); GL11.glVertex3f( -1.0f*xScale, -1.0f*yScale, 1.0f*zScale);
-		GL11.glTexCoord2f( 0.50f, 1.00f ); GL11.glVertex3f(  1.0f*xScale, -1.0f*yScale, 1.0f*zScale);
-		GL11.glTexCoord2f( 0.50f, 0.50f ); GL11.glVertex3f(  1.0f*xScale,  1.0f*yScale, 1.0f*zScale);
-		GL11.glTexCoord2f( 0.25f, 0.50f ); GL11.glVertex3f( -1.0f*xScale,  1.0f*yScale, 1.0f*zScale);
+		GL11.glTexCoord2f( type.fr_u_a, type.fr_v_a ); GL11.glVertex3f( -1.0f*xScale, -1.0f*yScale, 1.0f*zScale);
+		GL11.glTexCoord2f( type.fr_u_b, type.fr_v_b ); GL11.glVertex3f(  1.0f*xScale, -1.0f*yScale, 1.0f*zScale);
+		GL11.glTexCoord2f( type.fr_u_c, type.fr_v_c ); GL11.glVertex3f(  1.0f*xScale,  1.0f*yScale, 1.0f*zScale);
+		GL11.glTexCoord2f( type.fr_u_d, type.fr_v_d ); GL11.glVertex3f( -1.0f*xScale,  1.0f*yScale, 1.0f*zScale);
 		// Back
-		GL11.glTexCoord2f( 1.00f, 1.00f ); GL11.glVertex3f( -1.0f*xScale, -1.0f*yScale, -1.0f*zScale);
-		GL11.glTexCoord2f( 1.00f, 0.50f ); GL11.glVertex3f( -1.0f*xScale,  1.0f*yScale, -1.0f*zScale);
-		GL11.glTexCoord2f( 0.75f, 0.50f ); GL11.glVertex3f(  1.0f*xScale,  1.0f*yScale, -1.0f*zScale);
-		GL11.glTexCoord2f( 0.75f, 1.00f ); GL11.glVertex3f(  1.0f*xScale, -1.0f*yScale, -1.0f*zScale);
+		GL11.glTexCoord2f( type.ba_u_a, type.ba_v_a ); GL11.glVertex3f( -1.0f*xScale, -1.0f*yScale, -1.0f*zScale);
+		GL11.glTexCoord2f( type.ba_u_b, type.ba_v_b ); GL11.glVertex3f( -1.0f*xScale,  1.0f*yScale, -1.0f*zScale);
+		GL11.glTexCoord2f( type.ba_u_c, type.ba_v_c ); GL11.glVertex3f(  1.0f*xScale,  1.0f*yScale, -1.0f*zScale);
+		GL11.glTexCoord2f( type.ba_u_d, type.ba_v_d ); GL11.glVertex3f(  1.0f*xScale, -1.0f*yScale, -1.0f*zScale);
 		// Top
-		GL11.glTexCoord2f( 0.50f, 0.00f ); GL11.glVertex3f( -1.0f*xScale,  1.0f*yScale, -1.0f*zScale);
-		GL11.glTexCoord2f( 0.50f, 0.50f ); GL11.glVertex3f( -1.0f*xScale,  1.0f*yScale,  1.0f*zScale);
-		GL11.glTexCoord2f( 0.25f, 0.50f ); GL11.glVertex3f(  1.0f*xScale,  1.0f*yScale,  1.0f*zScale);
-		GL11.glTexCoord2f( 0.25f, 0.00f ); GL11.glVertex3f(  1.0f*xScale,  1.0f*yScale, -1.0f*zScale);
+		GL11.glTexCoord2f( type.to_u_a, type.to_v_a ); GL11.glVertex3f( -1.0f*xScale,  1.0f*yScale, -1.0f*zScale);
+		GL11.glTexCoord2f( type.to_u_b, type.to_v_b ); GL11.glVertex3f( -1.0f*xScale,  1.0f*yScale,  1.0f*zScale);
+		GL11.glTexCoord2f( type.to_u_c, type.to_v_c ); GL11.glVertex3f(  1.0f*xScale,  1.0f*yScale,  1.0f*zScale);
+		GL11.glTexCoord2f( type.to_u_d, type.to_v_d ); GL11.glVertex3f(  1.0f*xScale,  1.0f*yScale, -1.0f*zScale);
 		// Bottom
-		GL11.glTexCoord2f( 0.50f, 0.50f ); GL11.glVertex3f( -1.0f*xScale, -1.0f*yScale, -1.0f*zScale);
-		GL11.glTexCoord2f( 0.75f, 0.50f ); GL11.glVertex3f(  1.0f*xScale, -1.0f*yScale, -1.0f*zScale);
-		GL11.glTexCoord2f( 0.75f, 0.00f ); GL11.glVertex3f(  1.0f*xScale, -1.0f*yScale,  1.0f*zScale);
-		GL11.glTexCoord2f( 0.50f, 0.00f ); GL11.glVertex3f( -1.0f*xScale, -1.0f*yScale,  1.0f*zScale);
+		GL11.glTexCoord2f( type.bo_u_a, type.bo_v_a ); GL11.glVertex3f( -1.0f*xScale, -1.0f*yScale, -1.0f*zScale);
+		GL11.glTexCoord2f( type.bo_u_b, type.bo_v_b ); GL11.glVertex3f(  1.0f*xScale, -1.0f*yScale, -1.0f*zScale);
+		GL11.glTexCoord2f( type.bo_u_c, type.bo_v_c ); GL11.glVertex3f(  1.0f*xScale, -1.0f*yScale,  1.0f*zScale);
+		GL11.glTexCoord2f( type.bo_u_d, type.bo_v_d ); GL11.glVertex3f( -1.0f*xScale, -1.0f*yScale,  1.0f*zScale);
 		// Left
-		GL11.glTexCoord2f( 0.75f, 1.00f ); GL11.glVertex3f(  1.0f*xScale, -1.0f*yScale, -1.0f*zScale);
-		GL11.glTexCoord2f( 0.75f, 0.50f ); GL11.glVertex3f(  1.0f*xScale,  1.0f*yScale, -1.0f*zScale);
-		GL11.glTexCoord2f( 0.50f, 0.50f ); GL11.glVertex3f(  1.0f*xScale,  1.0f*yScale,  1.0f*zScale);
-		GL11.glTexCoord2f( 0.50f, 1.00f ); GL11.glVertex3f(  1.0f*xScale, -1.0f*yScale,  1.0f*zScale);
+		GL11.glTexCoord2f( type.le_u_a, type.le_v_a ); GL11.glVertex3f(  1.0f*xScale, -1.0f*yScale, -1.0f*zScale);
+		GL11.glTexCoord2f( type.le_u_b, type.le_v_b ); GL11.glVertex3f(  1.0f*xScale,  1.0f*yScale, -1.0f*zScale);
+		GL11.glTexCoord2f( type.le_u_c, type.le_v_c ); GL11.glVertex3f(  1.0f*xScale,  1.0f*yScale,  1.0f*zScale);
+		GL11.glTexCoord2f( type.le_u_d, type.le_v_d ); GL11.glVertex3f(  1.0f*xScale, -1.0f*yScale,  1.0f*zScale);
 		// Right
-		GL11.glTexCoord2f( 0.00f, 1.00f ); GL11.glVertex3f( -1.0f*xScale, -1.0f*yScale, -1.0f*zScale);
-		GL11.glTexCoord2f( 0.25f, 1.00f ); GL11.glVertex3f( -1.0f*xScale, -1.0f*yScale,  1.0f*zScale);
-		GL11.glTexCoord2f( 0.25f, 0.50f ); GL11.glVertex3f( -1.0f*xScale,  1.0f*yScale,  1.0f*zScale);
-		GL11.glTexCoord2f( 0.00f, 0.50f ); GL11.glVertex3f( -1.0f*xScale,  1.0f*yScale, -1.0f*zScale);
+		GL11.glTexCoord2f( type.ri_u_a, type.ri_v_a ); GL11.glVertex3f( -1.0f*xScale, -1.0f*yScale, -1.0f*zScale);
+		GL11.glTexCoord2f( type.ri_u_b, type.ri_v_b ); GL11.glVertex3f( -1.0f*xScale, -1.0f*yScale,  1.0f*zScale);
+		GL11.glTexCoord2f( type.ri_u_c, type.ri_v_c ); GL11.glVertex3f( -1.0f*xScale,  1.0f*yScale,  1.0f*zScale);
+		GL11.glTexCoord2f( type.ri_u_d, type.ri_v_d ); GL11.glVertex3f( -1.0f*xScale,  1.0f*yScale, -1.0f*zScale);
 		GL11.glEnd();
 		GL11.glPopMatrix();
 	}
@@ -276,7 +316,9 @@ public class TarRenderer {
 				.toString();
 	}
 
-	public void incrementAngle() {
-		angle += 0.5f;
+	public void modifyAngle(float angle, float tilt) {
+		this.angle += angle;
+		this.tilt += tilt;
 	}
+
 }

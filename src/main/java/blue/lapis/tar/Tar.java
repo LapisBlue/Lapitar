@@ -16,12 +16,14 @@ import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
 
+import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 
 import com.google.common.base.Stopwatch;
 
 public final class Tar {
 	private static final float DEFAULT_ANGLE = 45;
+	private static final float DEFAULT_TILT = 20;
 	private static final int DEFAULT_SIZE = 256;
 
 	public static void main(String[] args) {
@@ -35,6 +37,8 @@ public final class Tar {
 
 		OptionSpec<Float> angle = parser.acceptsAll(asList("angle", "a"), "The angle to render the head at, in degrees.")
 				.withRequiredArg().ofType(Float.class).defaultsTo(DEFAULT_ANGLE);
+		OptionSpec<Float> tilt = parser.acceptsAll(asList("tilt", "t"), "The tilt to render the head at, in degrees. Acts strange if shadow is enabled.")
+				.withRequiredArg().ofType(Float.class).defaultsTo(DEFAULT_TILT);
 
 		OptionSpec<Integer> width = parser.acceptsAll(asList("width", "w"), "The width of the canvas to render on, in pixels.")
 				.withRequiredArg().ofType(Integer.class).defaultsTo(DEFAULT_SIZE);
@@ -49,6 +53,7 @@ public final class Tar {
 		parser.accepts("no-helm", "Don't render the helm of the skin.");
 		parser.accepts("no-shadow", "Don't render the shadow.");
 		parser.accepts("no-lighting", "Don't enable lighting.");
+		parser.accepts("portrait", "Render the head, torso, and arms instead of just the head. Implies no-shadow.");
 
 		OptionSet options;
 		try {
@@ -77,12 +82,14 @@ public final class Tar {
 			watch.start();
 			TarRenderer renderer = new TarRenderer(
 					options.valueOf(angle),
+					options.valueOf(tilt),
 					options.valueOf(height),
 					options.valueOf(width),
 					options.valueOf(superSampling),
 					!options.has("no-helm"),
 					!options.has("no-shadow"),
 					!options.has("no-lighting"),
+					options.has("portrait"),
 					continuous
 			);
 			watch.stop();
@@ -183,7 +190,12 @@ public final class Tar {
 						fpsCounter = 0;
 						lastFrameUpdate = System.currentTimeMillis();
 					}
-					renderer.incrementAngle();
+					if (Mouse.isButtonDown(1)) {
+						renderer.modifyAngle(Mouse.getDX(), -Mouse.getDY());
+					} else {
+						Mouse.getDX();
+						Mouse.getDY();
+					}
 					Display.setTitle("Lapitar - "+fps+"/30 fps");
 					Display.update();
 					Display.sync(30);

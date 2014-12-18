@@ -84,8 +84,8 @@ public final class Tar {
 			TarRenderer renderer = new TarRenderer(
 					options.valueOf(angle),
 					options.valueOf(tilt),
-					options.valueOf(height),
 					options.valueOf(width),
+					options.valueOf(height),
 					options.valueOf(superSampling),
 					!options.has("no-helm"),
 					!options.has("no-shadow"),

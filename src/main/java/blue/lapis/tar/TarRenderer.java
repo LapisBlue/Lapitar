@@ -185,43 +185,43 @@ public class TarRenderer {
 		}
 		return img;
 	}
-	//private static final 
+	private static final float[] vertices = {
+		// Front
+		-1.0f, -1.0f,  1.0f,
+		 1.0f, -1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		// Back
+		-1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		// Top
+		-1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		// Bottom
+		-1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+		// Left
+		 1.0f, -1.0f,  1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f,  1.0f, -1.0f,
+		 1.0f,  1.0f,  1.0f,
+		// Right
+		-1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f, -1.0f
+	}; 
 	private void draw(float xScale, float yScale, float zScale, TextureType type) throws Exception {
 		GL11.glPushMatrix();
 		GL11.glBegin(GL11.GL_QUADS);
 		GL11.glNormal3f(0, 0, -1f);
-		float[] vertices = {
-				// Front
-				-1.0f, -1.0f,  1.0f,
-				 1.0f, -1.0f,  1.0f,
-				 1.0f,  1.0f,  1.0f,
-				-1.0f,  1.0f,  1.0f,
-				// Back
-				-1.0f, -1.0f, -1.0f,
-				 1.0f, -1.0f, -1.0f,
-				 1.0f,  1.0f, -1.0f,
-				-1.0f,  1.0f, -1.0f,
-				// Top
-				-1.0f,  1.0f,  1.0f,
-				 1.0f,  1.0f,  1.0f,
-				 1.0f,  1.0f, -1.0f,
-				-1.0f,  1.0f, -1.0f,
-				// Bottom
-				-1.0f, -1.0f, -1.0f,
-				 1.0f, -1.0f, -1.0f,
-				 1.0f, -1.0f,  1.0f,
-				-1.0f, -1.0f,  1.0f,
-				// Left
-				 1.0f, -1.0f,  1.0f,
-				 1.0f, -1.0f, -1.0f,
-				 1.0f,  1.0f, -1.0f,
-				 1.0f,  1.0f,  1.0f,
-				// Right
-				-1.0f, -1.0f, -1.0f,
-				-1.0f, -1.0f,  1.0f,
-				-1.0f,  1.0f,  1.0f,
-				-1.0f,  1.0f, -1.0f
-			};
+		
 		for (int i = 0; i < vertices.length/3; i++) {
 			int idx = i*3;
 			

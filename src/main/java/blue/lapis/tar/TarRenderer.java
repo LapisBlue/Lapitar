@@ -30,6 +30,12 @@ public class TarRenderer {
 	private static final int RIGHTARM_TEXTURE = 7;
 	private static final int RIGHTARM2_TEXTURE = 8;
 	
+	private static final int LEFTLEG_TEXTURE = 9;
+	private static final int LEFTLEG2_TEXTURE = 10;
+	
+	private static final int RIGHTLEG_TEXTURE = 11;
+	private static final int RIGHTLEG2_TEXTURE = 12;
+	
 	private float angle;
 	private float tilt;
 	
@@ -40,6 +46,7 @@ public class TarRenderer {
 	private final boolean shadow;
 	private final boolean lighting;
 	private final boolean portrait;
+	private final boolean body;
 	private final boolean isometric;
 
 	private final boolean useWindow;
@@ -53,7 +60,8 @@ public class TarRenderer {
 	public TarRenderer(float angle, float tilt, // Angles
 						int width, int height, int superSampling, // Size
 						boolean helmet, boolean shadow, boolean lighting, // Flags A
-						boolean portrait, boolean useWindow, boolean isometric) { // Flags B
+						boolean portrait, boolean useWindow, boolean isometric, // Flags B
+						boolean body) { // Flags C
 		this.angle = angle;
 		this.tilt = tilt;
 		this.width = width * superSampling;
@@ -62,11 +70,12 @@ public class TarRenderer {
 		this.finalHeight = height;
 		this.superSampling = superSampling;
 		this.helmet = helmet;
-		this.shadow = shadow && !portrait;
+		this.shadow = shadow;
 		this.lighting = lighting;
 		this.useWindow = useWindow;
 		this.portrait = portrait;
 		this.isometric = isometric;
+		this.body = body;
 	}
 
 	public BufferedImage render(BufferedImage skin) throws Exception {
@@ -92,35 +101,45 @@ public class TarRenderer {
 		lightAmbient.put(3.0f);
 		lightAmbient.put(1f);
 		lightAmbient.reset();
+		boolean newStyleSkin = (skin.getHeight() == 64);
 		upload(skin.getSubimage(0, 0, 32, 16), HEAD_TEXTURE);
 		if (helmet) {
 			upload(skin.getSubimage(32, 0, 32, 16), HEAD2_TEXTURE);
 		}
 		if (portrait) {
 			upload(skin.getSubimage(16, 16, 24, 16), TORSO_TEXTURE);
-			/*upload(body2, TORSO2_TEXTURE);
-			upload(larm, LEFTARM_TEXTURE);
-			upload(larm, LEFTARM2_TEXTURE);
-			upload(rarm2, RIGHTARM_TEXTURE);
-			upload(rarm2, RIGHTARM2_TEXTURE);*/
+			
+			upload(skin.getSubimage(0, 16, 16, 16), RIGHTLEG_TEXTURE);
+			upload(skin.getSubimage(40, 16, 16, 16), RIGHTARM_TEXTURE);
+			if (newStyleSkin) {
+				upload(skin.getSubimage(16, 32, 24, 16), TORSO2_TEXTURE);
+				
+				upload(skin.getSubimage(0, 32, 16, 16), RIGHTLEG2_TEXTURE);
+				upload(skin.getSubimage(40, 32, 16, 16), RIGHTARM2_TEXTURE);
+				
+				upload(skin.getSubimage(16, 48, 16, 16), LEFTLEG_TEXTURE);
+				upload(skin.getSubimage(32, 48, 16, 16), LEFTARM_TEXTURE);
+				
+				upload(skin.getSubimage(0, 48, 16, 16), LEFTLEG2_TEXTURE);
+				upload(skin.getSubimage(48, 48, 16, 16), LEFTARM2_TEXTURE);
+			} else {
+				upload(flipLimb(skin.getSubimage(0, 16, 16, 16)), LEFTLEG_TEXTURE);
+				upload(flipLimb(skin.getSubimage(40, 16, 16, 16)), LEFTARM_TEXTURE);
+			}
 		}
 
-		GL11.glEnable(GL11.GL_BLEND);
-		if (shadow) {
-			GL11.glDisable(GL11.GL_TEXTURE_2D);
-			GL11.glDisable(GL11.GL_LIGHTING);
-			GL11.glPushMatrix();
-				GL11.glTranslatef(0f, -0.95f, -0.45f);
-				float scale = 1.02f;
-				int count = 10;
-				for (int i = 0; i < count; i++) {
-					scale += 0.01f;
-					GL11.glTranslatef(0f, -0.001f, 0f);
-					GL11.glColor4f(0, 0, 0, (1-(i/(float)count))/2f);
-					draw(scale, 0.01f, scale, TextureType.NONE);
-				}
-			GL11.glPopMatrix();
+		if (body) {
+			GL11.glTranslatef(0,2.5f,-9f);
+		} else if (portrait) {
+			GL11.glTranslatef(0,1f,-6.5f);
+		} else {
+			GL11.glTranslatef(0,0,-4.5f);
 		}
+		GL11.glRotatef(tilt,1.0f,0f,0.0f);
+		GL11.glRotatef(angle,0f,1.0f,0f);
+		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+		
+		GL11.glEnable(GL11.GL_BLEND);
 
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
@@ -128,31 +147,92 @@ public class TarRenderer {
 			GL11.glEnable(GL11.GL_LIGHTING);
 			GL11.glEnable(GL11.GL_LIGHT0);
 		}
-		if (portrait) {
-			GL11.glTranslatef(0,0,-8.5f);
-		} else {
-			GL11.glTranslatef(0,0,-4.5f);
-		}
-		GL11.glRotatef(tilt,1.0f,0f,0.0f);
-		GL11.glRotatef(angle,0f,1.0f,0f);
 		GL11.glLight(GL11.GL_LIGHT0, GL11.GL_POSITION, lightPosition);
 		GL11.glLight(GL11.GL_LIGHT0, GL11.GL_AMBIENT, lightAmbient);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glColor3f(1, 1, 1);
 		if (portrait) {
 			GL11.glPushMatrix();
-			GL11.glBindTexture(GL11.GL_TEXTURE_2D, TORSO_TEXTURE);
 			GL11.glTranslatef(0f, -2.5f, 0f);
+			bind(TORSO_TEXTURE);
 			draw(1.0f, 1.5f, 0.5f, TextureType.TORSO);
+			if (newStyleSkin && helmet) {
+				bind(TORSO2_TEXTURE);
+				draw(1.05f, 1.55f, 0.55f, TextureType.TORSO);
+			}
+			
+			GL11.glPushMatrix();
+			bind(RIGHTARM_TEXTURE);
+			GL11.glTranslatef(-1.75f, 0.1f, 0f);
+			GL11.glRotatef(-10, 0f, 0f, 1f);
+			draw(0.5f, 1.5f, 0.5f, TextureType.LIMB);
+			if (newStyleSkin && helmet) {
+				bind(RIGHTARM2_TEXTURE);
+				draw(0.5f, 1.5f, 0.5f, TextureType.LIMB);
+			}
+			GL11.glPopMatrix();
+
+			GL11.glPushMatrix();
+			bind(LEFTARM_TEXTURE);
+			GL11.glTranslatef(1.75f, 0.1f, 0f);
+			GL11.glRotatef(10, 0f, 0f, 1f);
+			draw(0.5f, 1.5f, 0.5f, TextureType.LIMB);
+			if (newStyleSkin && helmet) {
+				bind(LEFTARM2_TEXTURE);
+				draw(0.5f, 1.5f, 0.5f, TextureType.LIMB);
+			}
+			GL11.glPopMatrix();
+			
+			GL11.glPushMatrix();
+			bind(RIGHTLEG_TEXTURE);
+			GL11.glTranslatef(-0.5f, -3f, 0f);
+			draw(0.5f, 1.5f, 0.5f, TextureType.LIMB);
+			if (newStyleSkin && helmet) {
+				bind(RIGHTLEG2_TEXTURE);
+				draw(0.5f, 1.5f, 0.5f, TextureType.LIMB);
+			}
+			GL11.glPopMatrix();
+
+			GL11.glPushMatrix();
+			bind(LEFTLEG_TEXTURE);
+			GL11.glTranslatef(0.5f, -3f, 0f);
+			draw(0.5f, 1.5f, 0.5f, TextureType.LIMB);
+			if (newStyleSkin && helmet) {
+				bind(LEFTLEG2_TEXTURE);
+				draw(0.5f, 1.5f, 0.5f, TextureType.LIMB);
+			}
+			GL11.glPopMatrix();
 			GL11.glPopMatrix();
 		}
-		GL11.glBindTexture(GL11.GL_TEXTURE_2D, HEAD_TEXTURE);
+		bind(HEAD_TEXTURE);
 		draw(1.0f, 1.0f, 1.0f, TextureType.HEAD);
 		if (helmet) {
-			GL11.glBindTexture(GL11.GL_TEXTURE_2D, HEAD2_TEXTURE);
+			bind(HEAD2_TEXTURE);
 			draw(1.05f, 1.05f, 1.05f, TextureType.HEAD);
 		}
 
+		if (shadow) {
+			GL11.glDisable(GL11.GL_TEXTURE_2D);
+			GL11.glDisable(GL11.GL_LIGHTING);
+			GL11.glPushMatrix();
+				GL11.glTranslatef(0f, -1f, 0f);
+				float scaleX = 0.99f;
+				float scaleZ = 0.99f;
+				if (portrait) {
+					scaleZ = 0.5f;
+					GL11.glTranslatef(0f, -6f, 0f);
+				}
+				int count = 10;
+				float inc = portrait ? 0.02f : 0.01f;
+				for (int i = 0; i < count; i++) {
+					scaleX += inc;
+					scaleZ += inc;
+					GL11.glTranslatef(0f, -0.001f, 0f);
+					GL11.glColor4f(0, 0, 0, (1-(i/(float)count))/2f);
+					draw(scaleX, 0.01f, scaleZ, TextureType.NONE);
+				}
+			GL11.glPopMatrix();
+		}
+		
 		GL11.glPopMatrix();
 		if (useWindow) {
 			return null;
@@ -165,6 +245,41 @@ public class TarRenderer {
 			cleanup();
 			return out;
 		}
+	}
+
+	private BufferedImage flipHorziontally(BufferedImage in) {
+		BufferedImage out = new BufferedImage(in.getWidth(), in.getHeight(), in.getType());
+		Graphics2D g = out.createGraphics();
+		g.drawImage(in, 0, 0, in.getWidth(), in.getHeight(), in.getWidth(), 0, 0, in.getHeight(), null);
+		g.dispose();
+		return out;
+	}
+	
+	private BufferedImage flipLimb(BufferedImage in) {
+		BufferedImage out = new BufferedImage(in.getWidth(), in.getHeight(), in.getType());
+		
+		BufferedImage front = flipHorziontally(in.getSubimage(4, 4, 4, 12));
+		BufferedImage back = flipHorziontally(in.getSubimage(12, 4, 4, 12));
+		
+		BufferedImage top = flipHorziontally(in.getSubimage(4, 0, 4, 4));
+		BufferedImage bottom = flipHorziontally(in.getSubimage(8, 0, 4, 4));
+		
+		BufferedImage left = in.getSubimage(8, 4, 4, 12);
+		BufferedImage right = in.getSubimage(0, 4, 4, 12);
+		
+		Graphics2D g = out.createGraphics();
+		g.drawImage(front, 4, 4, null);
+		g.drawImage(back, 12, 4, null);
+		g.drawImage(top, 4, 0, null);
+		g.drawImage(bottom, 8, 0, null);
+		g.drawImage(left, 0, 4, null); // left goes to right
+		g.drawImage(right, 8, 4, null); // right goes to left
+		g.dispose();
+		return out;
+	}
+
+	private void bind(int tex) {
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, tex);
 	}
 
 	private BufferedImage readPixels() {
@@ -300,6 +415,8 @@ public class TarRenderer {
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glDepthFunc(GL11.GL_LEQUAL);
 
+		GL11.glGenTextures();
+		
 		GL11.glMatrixMode(GL11.GL_PROJECTION);
 		GL11.glLoadIdentity();
 		if (isometric) {
@@ -344,3 +461,4 @@ public class TarRenderer {
 	}
 
 }
+

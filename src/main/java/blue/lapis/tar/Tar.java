@@ -53,7 +53,8 @@ public final class Tar {
 		parser.accepts("no-helm", "Don't render the helm of the skin.");
 		parser.accepts("no-shadow", "Don't render the shadow.");
 		parser.accepts("no-lighting", "Don't enable lighting.");
-		parser.accepts("portrait", "Render the head, torso, and arms instead of just the head. Implies no-shadow.");
+		parser.accepts("portrait", "Render the head, torso, and arms instead of just the head.");
+		parser.accepts("body", "Render the head, torso, arms, and legs instead of just the head.");
 		parser.accepts("isometric", "Render in ugly isometric mode instead of perspective mode.");
 
 		OptionSet options;
@@ -90,9 +91,10 @@ public final class Tar {
 					!options.has("no-helm"),
 					!options.has("no-shadow"),
 					!options.has("no-lighting"),
-					options.has("portrait"),
+					options.has("portrait") || options.has("body"),
 					continuous,
-					options.has("isometric")
+					options.has("isometric"),
+					options.has("body")
 			);
 			watch.stop();
 			System.err.println("Initialized renderer in " + Time.format(watch));

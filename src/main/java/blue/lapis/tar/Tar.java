@@ -37,7 +37,7 @@ public final class Tar {
 
 		OptionSpec<Float> angle = parser.acceptsAll(asList("angle", "a"), "The angle to render the head at, in degrees.")
 				.withRequiredArg().ofType(Float.class).defaultsTo(DEFAULT_ANGLE);
-		OptionSpec<Float> tilt = parser.acceptsAll(asList("tilt", "t"), "The tilt to render the head at, in degrees. Acts strange if shadow is enabled.")
+		OptionSpec<Float> tilt = parser.acceptsAll(asList("tilt", "t"), "The tilt to render the head at, in degrees.")
 				.withRequiredArg().ofType(Float.class).defaultsTo(DEFAULT_TILT);
 
 		OptionSpec<Integer> width = parser.acceptsAll(asList("width", "w"), "The width of the canvas to render on, in pixels.")
@@ -54,6 +54,7 @@ public final class Tar {
 		parser.accepts("no-shadow", "Don't render the shadow.");
 		parser.accepts("no-lighting", "Don't enable lighting.");
 		parser.accepts("portrait", "Render the head, torso, and arms instead of just the head. Implies no-shadow.");
+		parser.accepts("isometric", "Render in ugly isometric mode instead of perspective mode.");
 
 		OptionSet options;
 		try {
@@ -90,7 +91,8 @@ public final class Tar {
 					!options.has("no-shadow"),
 					!options.has("no-lighting"),
 					options.has("portrait"),
-					continuous
+					continuous,
+					options.has("isometric")
 			);
 			watch.stop();
 			System.err.println("Initialized renderer in " + Time.format(watch));

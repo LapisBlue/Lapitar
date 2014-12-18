@@ -40,6 +40,7 @@ public class TarRenderer {
 	private final boolean shadow;
 	private final boolean lighting;
 	private final boolean portrait;
+	private final boolean isometric;
 
 	private final boolean useWindow;
 	
@@ -52,7 +53,7 @@ public class TarRenderer {
 	public TarRenderer(float angle, float tilt, // Angles
 						int width, int height, int superSampling, // Size
 						boolean helmet, boolean shadow, boolean lighting, // Flags A
-						boolean portrait, boolean useWindow) { // Flags B
+						boolean portrait, boolean useWindow, boolean isometric) { // Flags B
 		this.angle = angle;
 		this.tilt = tilt;
 		this.width = width * superSampling;
@@ -65,6 +66,7 @@ public class TarRenderer {
 		this.lighting = lighting;
 		this.useWindow = useWindow;
 		this.portrait = portrait;
+		this.isometric = isometric;
 	}
 
 	public BufferedImage render(BufferedImage skin) throws Exception {
@@ -300,15 +302,19 @@ public class TarRenderer {
 
 		GL11.glMatrixMode(GL11.GL_PROJECTION);
 		GL11.glLoadIdentity();
-
-		GLU.gluPerspective(
-				45.0f,
-				(float) width / (float) height,
-				0.1f,
-				100.0f);
+		if (isometric) {
+			GL11.glOrtho(-5, 5, -5, 5, -2, 100);
+		} else {
+			GLU.gluPerspective(
+					45.0f,
+					(float) width / (float) height,
+					0.1f,
+					100.0f);
+			GL11.glHint(GL11.GL_PERSPECTIVE_CORRECTION_HINT, GL11.GL_NICEST);
+		}
 		GL11.glMatrixMode(GL11.GL_MODELVIEW);
 
-		GL11.glHint(GL11.GL_PERSPECTIVE_CORRECTION_HINT, GL11.GL_NICEST);
+		
 	}
 
 	private void cleanup() {

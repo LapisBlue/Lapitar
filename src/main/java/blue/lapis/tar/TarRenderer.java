@@ -183,40 +183,56 @@ public class TarRenderer {
 		}
 		return img;
 	}
+	//private static final 
 	private void draw(float xScale, float yScale, float zScale, TextureType type) throws Exception {
 		GL11.glPushMatrix();
 		GL11.glBegin(GL11.GL_QUADS);
 		GL11.glNormal3f(0, 0, -1f);
-		// Front
-		GL11.glTexCoord2f( type.fr_u_a, type.fr_v_a ); GL11.glVertex3f( -1.0f*xScale, -1.0f*yScale, 1.0f*zScale);
-		GL11.glTexCoord2f( type.fr_u_b, type.fr_v_b ); GL11.glVertex3f(  1.0f*xScale, -1.0f*yScale, 1.0f*zScale);
-		GL11.glTexCoord2f( type.fr_u_c, type.fr_v_c ); GL11.glVertex3f(  1.0f*xScale,  1.0f*yScale, 1.0f*zScale);
-		GL11.glTexCoord2f( type.fr_u_d, type.fr_v_d ); GL11.glVertex3f( -1.0f*xScale,  1.0f*yScale, 1.0f*zScale);
-		// Back
-		GL11.glTexCoord2f( type.ba_u_a, type.ba_v_a ); GL11.glVertex3f( -1.0f*xScale, -1.0f*yScale, -1.0f*zScale);
-		GL11.glTexCoord2f( type.ba_u_b, type.ba_v_b ); GL11.glVertex3f( -1.0f*xScale,  1.0f*yScale, -1.0f*zScale);
-		GL11.glTexCoord2f( type.ba_u_c, type.ba_v_c ); GL11.glVertex3f(  1.0f*xScale,  1.0f*yScale, -1.0f*zScale);
-		GL11.glTexCoord2f( type.ba_u_d, type.ba_v_d ); GL11.glVertex3f(  1.0f*xScale, -1.0f*yScale, -1.0f*zScale);
-		// Top
-		GL11.glTexCoord2f( type.to_u_a, type.to_v_a ); GL11.glVertex3f( -1.0f*xScale,  1.0f*yScale, -1.0f*zScale);
-		GL11.glTexCoord2f( type.to_u_b, type.to_v_b ); GL11.glVertex3f( -1.0f*xScale,  1.0f*yScale,  1.0f*zScale);
-		GL11.glTexCoord2f( type.to_u_c, type.to_v_c ); GL11.glVertex3f(  1.0f*xScale,  1.0f*yScale,  1.0f*zScale);
-		GL11.glTexCoord2f( type.to_u_d, type.to_v_d ); GL11.glVertex3f(  1.0f*xScale,  1.0f*yScale, -1.0f*zScale);
-		// Bottom
-		GL11.glTexCoord2f( type.bo_u_a, type.bo_v_a ); GL11.glVertex3f( -1.0f*xScale, -1.0f*yScale, -1.0f*zScale);
-		GL11.glTexCoord2f( type.bo_u_b, type.bo_v_b ); GL11.glVertex3f(  1.0f*xScale, -1.0f*yScale, -1.0f*zScale);
-		GL11.glTexCoord2f( type.bo_u_c, type.bo_v_c ); GL11.glVertex3f(  1.0f*xScale, -1.0f*yScale,  1.0f*zScale);
-		GL11.glTexCoord2f( type.bo_u_d, type.bo_v_d ); GL11.glVertex3f( -1.0f*xScale, -1.0f*yScale,  1.0f*zScale);
-		// Left
-		GL11.glTexCoord2f( type.le_u_a, type.le_v_a ); GL11.glVertex3f(  1.0f*xScale, -1.0f*yScale, -1.0f*zScale);
-		GL11.glTexCoord2f( type.le_u_b, type.le_v_b ); GL11.glVertex3f(  1.0f*xScale,  1.0f*yScale, -1.0f*zScale);
-		GL11.glTexCoord2f( type.le_u_c, type.le_v_c ); GL11.glVertex3f(  1.0f*xScale,  1.0f*yScale,  1.0f*zScale);
-		GL11.glTexCoord2f( type.le_u_d, type.le_v_d ); GL11.glVertex3f(  1.0f*xScale, -1.0f*yScale,  1.0f*zScale);
-		// Right
-		GL11.glTexCoord2f( type.ri_u_a, type.ri_v_a ); GL11.glVertex3f( -1.0f*xScale, -1.0f*yScale, -1.0f*zScale);
-		GL11.glTexCoord2f( type.ri_u_b, type.ri_v_b ); GL11.glVertex3f( -1.0f*xScale, -1.0f*yScale,  1.0f*zScale);
-		GL11.glTexCoord2f( type.ri_u_c, type.ri_v_c ); GL11.glVertex3f( -1.0f*xScale,  1.0f*yScale,  1.0f*zScale);
-		GL11.glTexCoord2f( type.ri_u_d, type.ri_v_d ); GL11.glVertex3f( -1.0f*xScale,  1.0f*yScale, -1.0f*zScale);
+		float[] vertices = {
+				// Front
+				-1.0f, -1.0f,  1.0f,
+				 1.0f, -1.0f,  1.0f,
+				 1.0f,  1.0f,  1.0f,
+				-1.0f,  1.0f,  1.0f,
+				// Back
+				-1.0f, -1.0f, -1.0f,
+				 1.0f, -1.0f, -1.0f,
+				 1.0f,  1.0f, -1.0f,
+				-1.0f,  1.0f, -1.0f,
+		        // Top
+				-1.0f,  1.0f,  1.0f,
+				 1.0f,  1.0f,  1.0f,
+				 1.0f,  1.0f, -1.0f,
+				-1.0f,  1.0f, -1.0f,
+				// Bottom              
+				-1.0f, -1.0f, -1.0f,
+				 1.0f, -1.0f, -1.0f,
+				 1.0f, -1.0f,  1.0f,
+				-1.0f, -1.0f,  1.0f,
+		        // Left
+				 1.0f, -1.0f,  1.0f,
+				 1.0f, -1.0f, -1.0f,
+				 1.0f,  1.0f, -1.0f,
+				 1.0f,  1.0f,  1.0f,
+				// Right
+				-1.0f, -1.0f, -1.0f,
+				-1.0f, -1.0f,  1.0f,
+				-1.0f,  1.0f,  1.0f,
+				-1.0f,  1.0f, -1.0f
+			};
+		for (int i = 0; i < vertices.length/3; i++) {
+			int idx = i*3;
+			
+			float vX = vertices[idx] * xScale;
+			float vY = vertices[idx+1] * yScale;
+			float vZ = vertices[idx+2] * zScale;
+			
+			float u = type.u[i];
+			float v = type.v[i];
+			
+			GL11.glTexCoord2f(u, v);
+			GL11.glVertex3f(vX, vY, vZ);
+		}
 		GL11.glEnd();
 		GL11.glPopMatrix();
 	}

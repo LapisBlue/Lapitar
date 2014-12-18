@@ -34,7 +34,7 @@ public enum TextureType {
 		// Right (Green)
 		0, 4, 4, 12
 	),
-	ARM(
+	LIMB(
 		16, 16,
 		// Front (Red)
 		4, 4, 4, 12,

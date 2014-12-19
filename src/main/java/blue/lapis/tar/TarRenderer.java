@@ -39,6 +39,8 @@ public class TarRenderer {
 	private float angle;
 	private float tilt;
 	
+	private float zoom;
+	
 	private final int width, height, finalWidth, finalHeight;
 	private final int superSampling;
 	
@@ -61,7 +63,9 @@ public class TarRenderer {
 						int width, int height, int superSampling, // Size
 						boolean helmet, boolean shadow, boolean lighting, // Flags A
 						boolean portrait, boolean useWindow, boolean isometric, // Flags B
-						boolean body) { // Flags C
+						boolean body, // Flags C
+						float zoom) { // Values
+			
 		this.angle = angle;
 		this.tilt = tilt;
 		this.width = width * superSampling;
@@ -76,6 +80,7 @@ public class TarRenderer {
 		this.portrait = portrait;
 		this.isometric = isometric;
 		this.body = body;
+		this.zoom = zoom;
 	}
 
 	public BufferedImage render(BufferedImage skin) throws Exception {
@@ -129,12 +134,11 @@ public class TarRenderer {
 		}
 
 		if (body) {
-			GL11.glTranslatef(0,2.5f,-9f);
+			GL11.glTranslatef(0,2.5f,-4.5f);
 		} else if (portrait) {
-			GL11.glTranslatef(0,1f,-6.5f);
-		} else {
-			GL11.glTranslatef(0,0,-4.5f);
+			GL11.glTranslatef(0,1f,-2f);
 		}
+		GL11.glTranslatef(0,0,zoom);
 		GL11.glRotatef(tilt,1.0f,0f,0.0f);
 		GL11.glRotatef(angle,0f,1.0f,0f);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
@@ -152,6 +156,7 @@ public class TarRenderer {
 				float scaleZ = 0.97f;
 				if (portrait) {
 					scaleZ = 0.47f;
+					GL11.glTranslatef(0f, -6.05f, 0f);
 				}
 				int count = 10;
 				float inc = 0.02f;
@@ -176,7 +181,6 @@ public class TarRenderer {
 		if (helmet) {
 			doDraw(true, portrait && newStyleSkin);
 		}
-		
 		GL11.glPopMatrix();
 		if (useWindow) {
 			return null;
@@ -442,6 +446,10 @@ public class TarRenderer {
 	public void modifyAngle(float angle, float tilt) {
 		this.angle += angle;
 		this.tilt += tilt;
+	}
+
+	public void modifyZoom(float zoom) {
+		this.zoom += zoom;
 	}
 
 }

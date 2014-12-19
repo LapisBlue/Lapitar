@@ -47,6 +47,8 @@ public final class Tar {
 
 		OptionSpec<Integer> superSampling = parser.acceptsAll(asList("supersampling", "s"), "The amount of super sampling to perform, as a multiplier to width and height.")
 				.withRequiredArg().ofType(Integer.class).defaultsTo(4);
+		OptionSpec<Float> zoom = parser.acceptsAll(asList("zoom", "z"), "The amount to zoom in or out.")
+				.withRequiredArg().ofType(Float.class).defaultsTo(-4.5f);
 		
 		parser.acceptsAll(asList("continuous"), "Continuously render a head in a window. Intended for debugging. Doesn't work properly with supersampling.");
 
@@ -94,7 +96,8 @@ public final class Tar {
 					options.has("portrait") || options.has("body"),
 					continuous,
 					options.has("isometric"),
-					options.has("body")
+					options.has("body"),
+					options.valueOf(zoom)
 			);
 			watch.stop();
 			System.err.println("Initialized renderer in " + Time.format(watch));
@@ -194,6 +197,7 @@ public final class Tar {
 						fpsCounter = 0;
 						lastFrameUpdate = System.currentTimeMillis();
 					}
+					renderer.modifyZoom(Mouse.getDWheel()/240f);
 					if (Mouse.isButtonDown(1)) {
 						renderer.modifyAngle(Mouse.getDX(), -Mouse.getDY());
 					} else {

@@ -140,7 +140,8 @@ public class TarRenderer {
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		
 		GL11.glEnable(GL11.GL_BLEND);
-
+		GL11.glEnable(GL11.GL_ALPHA_TEST);
+		GL11.glAlphaFunc(GL11.GL_SRC_ALPHA, GL11.GL_GREATER);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		if (lighting) {
@@ -151,65 +152,12 @@ public class TarRenderer {
 		GL11.glLight(GL11.GL_LIGHT0, GL11.GL_AMBIENT, lightAmbient);
 		GL11.glColor3f(1, 1, 1);
 		if (portrait) {
-			GL11.glPushMatrix();
-			GL11.glTranslatef(0f, -2.5f, 0f);
-			bind(TORSO_TEXTURE);
-			draw(1.0f, 1.5f, 0.5f, TextureType.TORSO);
-			if (newStyleSkin && helmet) {
-				bind(TORSO2_TEXTURE);
-				draw(1.05f, 1.55f, 0.55f, TextureType.TORSO);
-			}
 			
-			GL11.glPushMatrix();
-			bind(RIGHTARM_TEXTURE);
-			GL11.glTranslatef(-1.75f, 0.1f, 0f);
-			GL11.glRotatef(-10, 0f, 0f, 1f);
-			draw(0.5f, 1.5f, 0.5f, TextureType.LIMB);
-			if (newStyleSkin && helmet) {
-				bind(RIGHTARM2_TEXTURE);
-				draw(0.5f, 1.5f, 0.5f, TextureType.LIMB);
-			}
-			GL11.glPopMatrix();
-
-			GL11.glPushMatrix();
-			bind(LEFTARM_TEXTURE);
-			GL11.glTranslatef(1.75f, 0.1f, 0f);
-			GL11.glRotatef(10, 0f, 0f, 1f);
-			draw(0.5f, 1.5f, 0.5f, TextureType.LIMB);
-			if (newStyleSkin && helmet) {
-				bind(LEFTARM2_TEXTURE);
-				draw(0.5f, 1.5f, 0.5f, TextureType.LIMB);
-			}
-			GL11.glPopMatrix();
-			
-			GL11.glPushMatrix();
-			bind(RIGHTLEG_TEXTURE);
-			GL11.glTranslatef(-0.5f, -3f, 0f);
-			draw(0.5f, 1.5f, 0.5f, TextureType.LIMB);
-			if (newStyleSkin && helmet) {
-				bind(RIGHTLEG2_TEXTURE);
-				draw(0.5f, 1.5f, 0.5f, TextureType.LIMB);
-			}
-			GL11.glPopMatrix();
-
-			GL11.glPushMatrix();
-			bind(LEFTLEG_TEXTURE);
-			GL11.glTranslatef(0.5f, -3f, 0f);
-			draw(0.5f, 1.5f, 0.5f, TextureType.LIMB);
-			if (newStyleSkin && helmet) {
-				bind(LEFTLEG2_TEXTURE);
-				draw(0.5f, 1.5f, 0.5f, TextureType.LIMB);
-			}
-			GL11.glPopMatrix();
-			GL11.glPopMatrix();
 		}
-		bind(HEAD_TEXTURE);
-		draw(1.0f, 1.0f, 1.0f, TextureType.HEAD);
+		doDraw(false, true);
 		if (helmet) {
-			bind(HEAD2_TEXTURE);
-			draw(1.05f, 1.05f, 1.05f, TextureType.HEAD);
+			doDraw(true, newStyleSkin);
 		}
-
 		if (shadow) {
 			GL11.glDisable(GL11.GL_TEXTURE_2D);
 			GL11.glDisable(GL11.GL_LIGHTING);
@@ -219,7 +167,6 @@ public class TarRenderer {
 				float scaleZ = 0.99f;
 				if (portrait) {
 					scaleZ = 0.5f;
-					GL11.glTranslatef(0f, -6f, 0f);
 				}
 				int count = 10;
 				float inc = portrait ? 0.02f : 0.01f;
@@ -244,6 +191,45 @@ public class TarRenderer {
 			gout.dispose();
 			cleanup();
 			return out;
+		}
+	}
+
+	private void doDraw(boolean outer, boolean body) throws Exception {
+		float ofs = (outer ? 0.05f : 0f);
+		bind(HEAD_TEXTURE + (outer ? 1 : 0));
+		draw(1f+ofs, 1f+ofs, 1f+ofs, TextureType.HEAD);
+		if (body) {
+			GL11.glPushMatrix();
+				GL11.glTranslatef(0f, -2.5f, 0f);
+				bind(TORSO_TEXTURE + (outer ? 1 : 0));
+				draw(1.0f + ofs, 1.5f + ofs, 0.5f + ofs, TextureType.TORSO);
+				
+				GL11.glPushMatrix();
+					bind(RIGHTARM_TEXTURE + (outer ? 1 : 0));
+					GL11.glTranslatef(-1.75f, 0.1f, 0f);
+					GL11.glRotatef(-10, 0f, 0f, 1f);
+					draw(0.5f + ofs, 1.5f + ofs, 0.5f + ofs, TextureType.LIMB);
+				GL11.glPopMatrix();
+		
+				GL11.glPushMatrix();
+					bind(LEFTARM_TEXTURE + (outer ? 1 : 0));
+					GL11.glTranslatef(1.75f, 0.1f, 0f);
+					GL11.glRotatef(10, 0f, 0f, 1f);
+					draw(0.5f + ofs, 1.5f + ofs, 0.5f + ofs, TextureType.LIMB);
+				GL11.glPopMatrix();
+				
+				GL11.glPushMatrix();
+					bind(RIGHTLEG_TEXTURE + (outer ? 1 : 0));
+					GL11.glTranslatef(-0.5f, -3f, 0f);
+					draw(0.5f + ofs, 1.5f + ofs, 0.5f + ofs, TextureType.LIMB);
+				GL11.glPopMatrix();
+		
+				GL11.glPushMatrix();
+					bind(LEFTLEG_TEXTURE + (outer ? 1 : 0));
+					GL11.glTranslatef(0.5f, -3f, 0f);
+					draw(0.5f + ofs, 1.5f + ofs, 0.5f + ofs, TextureType.LIMB);
+				GL11.glPopMatrix();
+			GL11.glPopMatrix();
 		}
 	}
 
@@ -435,6 +421,7 @@ public class TarRenderer {
 	}
 
 	private void cleanup() {
+		initialized = false;
 		if (useWindow) {
 			Display.destroy();
 		} else {

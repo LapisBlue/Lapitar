@@ -11,8 +11,8 @@ import (
 func serveRender(c web.C, w http.ResponseWriter, r *http.Request, size int, conf *renderConfig, portrait, full bool) {
 	watch := util.StartedWatch()
 
-	if size < render.MinimalSize {
-		size = render.MinimalSize
+	if size < render.MinimumSize {
+		size = render.MinimumSize
 	} else if size > conf.Size.Max {
 		size = conf.Size.Max
 	}

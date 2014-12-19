@@ -8,7 +8,7 @@ import (
 	"image/draw"
 )
 
-const MinimalSize = 8
+const MinimumSize = 8
 
 var DefaultScale = &imaging.NearestNeighbor
 
@@ -23,7 +23,7 @@ func Render(sk mc.Skin, size int, overlay bool, filter *imaging.ResampleFilter) 
 		}
 	}
 
-	if size <= MinimalSize {
+	if size <= MinimumSize {
 		return face
 	}
 

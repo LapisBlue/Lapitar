@@ -142,34 +142,19 @@ public class TarRenderer {
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glEnable(GL11.GL_ALPHA_TEST);
 		GL11.glAlphaFunc(GL11.GL_SRC_ALPHA, GL11.GL_GREATER);
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		if (lighting) {
-			GL11.glEnable(GL11.GL_LIGHTING);
-			GL11.glEnable(GL11.GL_LIGHT0);
-		}
-		GL11.glLight(GL11.GL_LIGHT0, GL11.GL_POSITION, lightPosition);
-		GL11.glLight(GL11.GL_LIGHT0, GL11.GL_AMBIENT, lightAmbient);
-		GL11.glColor3f(1, 1, 1);
-		if (portrait) {
-			
-		}
-		doDraw(false, true);
-		if (helmet) {
-			doDraw(true, newStyleSkin);
-		}
 		if (shadow) {
 			GL11.glDisable(GL11.GL_TEXTURE_2D);
 			GL11.glDisable(GL11.GL_LIGHTING);
 			GL11.glPushMatrix();
 				GL11.glTranslatef(0f, -1f, 0f);
-				float scaleX = 0.99f;
-				float scaleZ = 0.99f;
+				float scaleX = 0.97f;
+				float scaleZ = 0.97f;
 				if (portrait) {
-					scaleZ = 0.5f;
+					scaleZ = 0.47f;
 				}
 				int count = 10;
-				float inc = portrait ? 0.02f : 0.01f;
+				float inc = 0.02f;
 				for (int i = 0; i < count; i++) {
 					scaleX += inc;
 					scaleZ += inc;
@@ -178,6 +163,18 @@ public class TarRenderer {
 					draw(scaleX, 0.01f, scaleZ, TextureType.NONE);
 				}
 			GL11.glPopMatrix();
+		}
+		if (lighting) {
+			GL11.glEnable(GL11.GL_LIGHTING);
+			GL11.glEnable(GL11.GL_LIGHT0);
+		}
+		GL11.glLight(GL11.GL_LIGHT0, GL11.GL_POSITION, lightPosition);
+		GL11.glLight(GL11.GL_LIGHT0, GL11.GL_AMBIENT, lightAmbient);
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		GL11.glColor3f(1, 1, 1);
+		doDraw(false, portrait);
+		if (helmet) {
+			doDraw(true, portrait && newStyleSkin);
 		}
 		
 		GL11.glPopMatrix();

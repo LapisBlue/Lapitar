@@ -197,13 +197,23 @@ public class TarRenderer {
 
 	private void doDraw(boolean outer, boolean body) throws Exception {
 		float ofs = (outer ? 0.05f : 0f);
-		bind(HEAD_TEXTURE + (outer ? 1 : 0));
-		draw(1f+ofs, 1f+ofs, 1f+ofs, TextureType.HEAD);
 		if (body) {
 			GL11.glPushMatrix();
 				GL11.glTranslatef(0f, -2.5f, 0f);
 				bind(TORSO_TEXTURE + (outer ? 1 : 0));
 				draw(1.0f + ofs, 1.5f + ofs, 0.5f + ofs, TextureType.TORSO);
+				
+				GL11.glPushMatrix();
+					bind(RIGHTLEG_TEXTURE + (outer ? 1 : 0));
+					GL11.glTranslatef(-0.5f, -3f, 0f);
+					draw(0.5f + ofs, 1.5f + ofs, 0.5f + ofs, TextureType.LIMB);
+				GL11.glPopMatrix();
+		
+				GL11.glPushMatrix();
+					bind(LEFTLEG_TEXTURE + (outer ? 1 : 0));
+					GL11.glTranslatef(0.5f, -3f, 0f);
+					draw(0.5f + ofs, 1.5f + ofs, 0.5f + ofs, TextureType.LIMB);
+				GL11.glPopMatrix();
 				
 				GL11.glPushMatrix();
 					bind(RIGHTARM_TEXTURE + (outer ? 1 : 0));
@@ -219,19 +229,10 @@ public class TarRenderer {
 					draw(0.5f + ofs, 1.5f + ofs, 0.5f + ofs, TextureType.LIMB);
 				GL11.glPopMatrix();
 				
-				GL11.glPushMatrix();
-					bind(RIGHTLEG_TEXTURE + (outer ? 1 : 0));
-					GL11.glTranslatef(-0.5f, -3f, 0f);
-					draw(0.5f + ofs, 1.5f + ofs, 0.5f + ofs, TextureType.LIMB);
-				GL11.glPopMatrix();
-		
-				GL11.glPushMatrix();
-					bind(LEFTLEG_TEXTURE + (outer ? 1 : 0));
-					GL11.glTranslatef(0.5f, -3f, 0f);
-					draw(0.5f + ofs, 1.5f + ofs, 0.5f + ofs, TextureType.LIMB);
-				GL11.glPopMatrix();
 			GL11.glPopMatrix();
 		}
+		bind(HEAD_TEXTURE + (outer ? 1 : 0));
+		draw(1f+ofs, 1f+ofs, 1f+ofs, TextureType.HEAD);
 	}
 
 	private BufferedImage flipHorziontally(BufferedImage in) {

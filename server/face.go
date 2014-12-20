@@ -12,8 +12,8 @@ func serveFace(c web.C, w http.ResponseWriter, r *http.Request, size int) {
 	watch := util.StartedWatch()
 
 	conf := defaults.Face
-	if size < face.MinimalSize {
-		size = face.MinimalSize
+	if size < face.MinimumSize {
+		size = face.MinimumSize
 	} else if size > conf.Size.Max {
 		size = conf.Size.Max
 	}

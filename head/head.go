@@ -13,7 +13,7 @@ import (
 	"unsafe"
 )
 
-const MinimalSize = 32
+const MinimumSize = 32
 
 var DefaultScale = &imaging.Linear
 

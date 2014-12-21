@@ -67,7 +67,7 @@ func runHead(name string, args []string) int {
 			return PrintError(err, "Failed to download skin:", player)
 		}
 
-		head, err := render.RenderHead(skin, *angle, 20, -4.5, *width, *height, *superSampling, !*nohelm, !*noshadow, !*nolighting, scale.Get())
+		head, err := render.Render(skin, *angle, 20, -4.5, *width, *height, *superSampling, false, false, !*nohelm, !*noshadow, !*nolighting, scale.Get())
 		if err != nil {
 			return PrintError(err, "Failed to render head:", player)
 		}
@@ -96,7 +96,7 @@ func runHead(name string, args []string) int {
 
 		watch.Mark()
 
-		heads[i], err = render.RenderHead(skin, *angle, 20, -4.5, *width, *height, *superSampling, !*nohelm, !*noshadow, !*nolighting, scale.Get())
+		heads[i], err = render.Render(skin, *angle, 20, -4.5, *width, *height, *superSampling, false, false, !*nohelm, !*noshadow, !*nolighting, scale.Get())
 		if err != nil {
 			PrintError(err, "Failed to render head:", players[i], watch)
 			continue

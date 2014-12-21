@@ -33,6 +33,10 @@ func start(conf *config, www string) {
 
 	register("/head/:player", serveHeadNormal)
 	register("/head/:size/:player", serveHeadWithSize)
+	register("/portrait/:player", servePortraitNormal)
+	register("/portrait/:size/:player", servePortraitWithSize)
+	register("/body/:player", serveBodyNormal)
+	register("/body/:size/:player", serveBodyWithSize)
 
 	if exists(www) {
 		goji.Get("/*", http.FileServer(http.Dir(www)))

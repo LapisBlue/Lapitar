@@ -14,49 +14,62 @@ const (
 )
 
 type config struct {
-	Address string      `json:"address" xml:"address"`
-	Proxy   bool        `json:"proxy" xml:"proxy"`
-	Head    *headConfig `json:"head" xml:"head"`
-	Face    *faceConfig `json:"face" xml:"face"`
+	Address  string        `json:"address"`
+	Proxy    bool          `json:"proxy"`
+	Head     *renderConfig `json:"head"`
+	Portrait *renderConfig `json:"portrait"`
+	Body     *renderConfig `json:"body"`
+	Face     *faceConfig   `json:"face"`
 }
 
 type faceConfig struct {
-	Size  *limitedInt `json:"size" xml:"size" schema:"size"`
-	Scale *scaling    `json:"scale" xml:"scale"`
+	Size  *limitedInt `json:"size"`
+	Scale *scaling    `json:"scale"`
 }
 
-type headConfig struct {
+type renderConfig struct {
 	*faceConfig
-	Helm          bool    `json:"helm" xml:"helm" schema:"helm"`
-	Angle         float32 `json:"angle" xml:"angle" schema:"angle"`
-	SuperSampling int     `json:"supersampling" xml:"supersampling"`
-	Shadow        bool    `json:"shadow" xml:"shadow"`
-	Lighting      bool    `json:"lighting" xml:"lighting"`
+	Overlay       bool    `json:"overlay"`
+	Angle         float32 `json:"angle"`
+	Tilt          float32 `json:"tilt"`
+	Zoom          float32 `json:"zoom"`
+	SuperSampling int     `json:"supersampling"`
+	Shadow        bool    `json:"shadow"`
+	Lighting      bool    `json:"lighting"`
 }
 
 type limitedInt struct {
-	Def int `json:"default" xml:"default"`
-	Max int `json:"max", xml:"max"`
+	Def int `json:"default"`
+	Max int `json:"max"`
 }
 
 func defaultConfig() *config {
 	return &config{
 		":8088",
 		false,
-		&headConfig{
-			&faceConfig{
-				&limitedInt{128, 512},
-				&scaling{render.DefaultScale},
-			},
-			true,
-			-35,
-			4,
-			true,
-			true,
-		}, &faceConfig{
+		newRenderConfig(-35, 20),
+		newRenderConfig(25, 10),
+		newRenderConfig(25, 10),
+		&faceConfig{
 			&limitedInt{128, 512},
 			&scaling{face.DefaultScale},
 		},
+	}
+}
+
+func newRenderConfig(angle, tilt float32) *renderConfig {
+	return &renderConfig{
+		&faceConfig{
+			&limitedInt{128, 512},
+			&scaling{render.DefaultScale},
+		},
+		true,
+		angle,
+		tilt,
+		-4.5,
+		4,
+		true,
+		true,
 	}
 }
 

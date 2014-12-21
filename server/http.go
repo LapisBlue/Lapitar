@@ -24,11 +24,13 @@ func start(conf *config) {
 
 	register("/skin/:player", serveSkin)
 
-	register("/head/:player", serveHeadNormal)
-	register("/head/:size/:player", serveHeadWithSize)
-
 	register("/face/:player", serveFaceNormal)
 	register("/face/:size/:player", serveFaceWithSize)
+	register("/helm/:player", serveHelmNormal)
+	register("/helm/:size/:player", serveHelmWithSize)
+
+	register("/head/:player", serveHeadNormal)
+	register("/head/:size/:player", serveHeadWithSize)
 
 	goji.Get("/*", http.FileServer(http.Dir("www"))) // TODO: How to find the correct dir?
 

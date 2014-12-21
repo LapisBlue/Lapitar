@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-func serveFace(c web.C, w http.ResponseWriter, r *http.Request, size int) {
+func serveFace(c web.C, w http.ResponseWriter, r *http.Request, size int, overlay bool) {
 	watch := util.StartedWatch()
 
 	conf := defaults.Face
@@ -30,7 +30,7 @@ func serveFace(c web.C, w http.ResponseWriter, r *http.Request, size int) {
 	prepareResponse(w, r, skin)
 
 	watch.Mark()
-	result := face.Render(skin.Skin(), size, conf.Helm, conf.Scale.Get())
+	result := face.Render(skin.Skin(), size, overlay, conf.Scale.Get())
 	log.Println("Rendered face:", player, watch)
 
 	sendResult(w, player, result, watch)
@@ -38,9 +38,17 @@ func serveFace(c web.C, w http.ResponseWriter, r *http.Request, size int) {
 }
 
 func serveFaceNormal(c web.C, w http.ResponseWriter, r *http.Request) {
-	serveFace(c, w, r, defaults.Head.Size.Def)
+	serveFace(c, w, r, defaults.Head.Size.Def, false)
 }
 
 func serveFaceWithSize(c web.C, w http.ResponseWriter, r *http.Request) {
-	serveFace(c, w, r, parseSize(c, defaults.Face.Size.Def))
+	serveFace(c, w, r, parseSize(c, defaults.Face.Size.Def), false)
+}
+
+func serveHelmNormal(c web.C, w http.ResponseWriter, r *http.Request) {
+	serveFace(c, w, r, defaults.Head.Size.Def, true)
+}
+
+func serveHelmWithSize(c web.C, w http.ResponseWriter, r *http.Request) {
+	serveFace(c, w, r, parseSize(c, defaults.Face.Size.Def), true)
 }

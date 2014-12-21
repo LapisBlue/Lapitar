@@ -18,7 +18,7 @@ func Render(sk mc.Skin, size int, overlay bool, filter *imaging.ResampleFilter) 
 		helm := sk.OverlayFace(mc.Head, mc.Front)
 		if !util.IsSolidColor(helm) {
 			temp := imaging.Clone(face)
-			draw.Draw(temp, face.Bounds(), helm, helm.Bounds().Min, draw.Over)
+			draw.Draw(temp, temp.Bounds(), helm, helm.Bounds().Min, draw.Over)
 			face = temp
 		}
 	}

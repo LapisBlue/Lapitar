@@ -22,12 +22,12 @@ type config struct {
 
 type faceConfig struct {
 	Size  *limitedInt `json:"size" xml:"size" schema:"size"`
-	Helm  bool        `json:"helm" xml:"helm" schema:"helm"`
 	Scale *scaling    `json:"scale" xml:"scale"`
 }
 
 type headConfig struct {
 	*faceConfig
+	Helm          bool    `json:"helm" xml:"helm" schema:"helm"`
 	Angle         float32 `json:"angle" xml:"angle" schema:"angle"`
 	SuperSampling int     `json:"supersampling" xml:"supersampling"`
 	Shadow        bool    `json:"shadow" xml:"shadow"`
@@ -46,16 +46,15 @@ func defaultConfig() *config {
 		&headConfig{
 			&faceConfig{
 				&limitedInt{128, 512},
-				true,
 				&scaling{render.DefaultScale},
 			},
+			true,
 			-35,
 			4,
 			true,
 			true,
 		}, &faceConfig{
 			&limitedInt{128, 512},
-			false,
 			&scaling{face.DefaultScale},
 		},
 	}

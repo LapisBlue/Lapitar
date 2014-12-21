@@ -154,6 +154,8 @@ bool Render(
             glTranslatef(0.0f, 2.5f, -4.5f);
         else if (portrait)
             glTranslatef(0.0f, 1.0f, -2.0f);
+        else
+            glTranslatef(0.0f, 0.20f, 0.0f);
 
         glTranslatef(0, 0, zoom);
         glRotatef(tilt, 1.0f, 0.0f, 0.0f);

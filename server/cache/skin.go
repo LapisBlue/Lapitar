@@ -46,7 +46,7 @@ type Meta interface {
 // A downloaded skin
 type Skin interface {
 	Meta
-	Skin() *mc.Skin
+	Skin() mc.Skin
 }
 
 type skinSource struct {
@@ -163,7 +163,7 @@ func (skin *skinSource) Load() (resultSkin Skin) {
 		return
 	}
 
-	result.skin = mc.CreateSkin(img)
+	result.skin = mc.CreateSkin(img, false) // TODO: alex support
 	return
 }
 
@@ -368,13 +368,13 @@ func (meta skinMeta) LastMod() time.Time {
 
 type localSkin struct {
 	skinMeta
-	skin *mc.Skin
+	skin mc.Skin
 }
 
 func (skin *localSkin) Load() Skin {
 	return skin
 }
 
-func (skin *localSkin) Skin() *mc.Skin {
+func (skin *localSkin) Skin() mc.Skin {
 	return skin.skin
 }

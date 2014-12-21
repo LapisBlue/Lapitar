@@ -91,11 +91,11 @@ func readFile(path string) ([]string, error) {
 	return readLines(file)
 }
 
-func downloadSkins(players []string) (result []*mc.Skin) {
+func downloadSkins(players []string) (result []mc.Skin) {
 	fmt.Printf("Downloading %d skin(s), please wait...\n", len(players))
 
 	watch := util.GlobalWatch().Mark()
-	result = make([]*mc.Skin, len(players))
+	result = make([]mc.Skin, len(players))
 
 	var err error
 	for i, player := range players {

@@ -4,102 +4,150 @@ import (
 	"image"
 )
 
+type SkinPart byte
+
+const (
+	Head SkinPart = iota
+	Body
+	LeftArm
+	RightArm
+	LeftLeg
+	RightLeg
+	skinPartCount
+)
+
+type Face byte
+
+const (
+	All Face = iota
+	Front
+	Back
+	Top
+	Bottom
+	Left
+	Right
+	faceCount
+)
+
+var headModel = [faceCount]image.Rectangle{
+	bounds(32, 16),        // All
+	relative(8, 8, 8, 8),  // Front
+	relative(24, 8, 8, 8), // Back
+	relative(8, 0, 8, 8),  // Top
+	relative(16, 0, 8, 8), // Bottom
+	relative(16, 8, 8, 8), // Left
+	relative(0, 8, 8, 8),  // Right
+}
+
+var bodyModel = [faceCount]image.Rectangle{
+	bounds(24, 16),         // All
+	relative(4, 4, 8, 12),  // Front
+	relative(16, 4, 8, 12), // Back
+	relative(4, 0, 8, 4),   // Top
+	relative(12, 0, 8, 4),  // Bottom
+	relative(12, 4, 4, 12), // Left
+	relative(0, 4, 4, 12),  // Right
+}
+
+var limbModel = [faceCount]image.Rectangle{
+	bounds(16, 16),         // All
+	relative(4, 4, 4, 12),  // Front
+	relative(12, 4, 4, 12), // Back
+	relative(4, 0, 4, 4),   // Top
+	relative(8, 0, 4, 4),   // Bottom
+	relative(8, 4, 4, 12),  // Left
+	relative(0, 4, 4, 12),  // Right
+}
+
+var alexArmModel = [faceCount]image.Rectangle{
+	bounds(14, 16),         // All
+	relative(4, 4, 3, 12),  // Front
+	relative(11, 4, 3, 12), // Back
+	relative(4, 0, 3, 4),   // Top
+	relative(7, 0, 3, 4),   // Bottom
+	relative(7, 4, 4, 12),  // Left
+	relative(0, 4, 4, 12),  // Right
+}
+
+var positions = [skinPartCount]image.Point{
+	image.ZP,         // Head
+	image.Pt(16, 16), // Body
+	image.Pt(32, 48), // Left Arm
+	image.Pt(40, 16), // Right Arm
+	image.Pt(16, 48), // Left Leg
+	image.Pt(0, 16),  // Right Leg
+}
+
+var overlayPositions = [skinPartCount]image.Point{
+	image.Pt(32, 0),  // Head Overlay
+	image.Pt(16, 32), // Body Overlay
+	image.Pt(48, 48), // Left Arm Overlay
+	image.Pt(40, 32), // Right Arm Overlay
+	image.Pt(0, 48),  // Left Leg Overlay
+	image.Pt(0, 32),  // Right Leg Overlay
+}
+
+type Skin interface {
+	Image() image.Image
+	IsAlex() bool
+	IsLegacy() bool
+	Get(part SkinPart) image.Image
+	GetFace(part SkinPart, face Face) image.Image
+	Overlay(part SkinPart) image.Image
+	OverlayFace(part SkinPart, face Face) image.Image
+}
+
 type cuttableImage interface {
 	image.Image
 	SubImage(r image.Rectangle) image.Image
 }
 
-type Skin struct {
-	image cuttableImage
-}
-
-func CreateSkin(skin image.Image) *Skin {
+func CreateSkin(skin image.Image, alex bool) Skin {
 	if image, ok := skin.(cuttableImage); ok {
-		return &Skin{image}
+		height := image.Bounds().Dy()
+		if height == 64 {
+			return &newSkin{image: image, alex: alex}
+		} else if height == 32 {
+			return &legacySkin{image: image, alex: alex}
+		} else {
+			panic("Unsupported skin format")
+		}
 	}
 
-	return nil // TODO
+	panic("Unsupported image type") // TODO
 }
 
-func (skin *Skin) Image() image.Image {
-	return skin.image
+func getModel(skin Skin, part SkinPart) [faceCount]image.Rectangle {
+	switch part {
+	case Head:
+		return headModel
+	case Body:
+		return bodyModel
+	case LeftLeg, RightLeg:
+		return limbModel
+	case RightArm, LeftArm:
+		if skin.IsAlex() {
+			return alexArmModel
+		} else {
+			return limbModel
+		}
+	default:
+		panic("Unknown skin part")
+	}
 }
 
-// Head
-var head = [faceCount]image.Rectangle{
-	rectFrom(0, 0, 32, 16), // All
-	rectFrom(8, 0, 8, 8),   // Top
-	rectFrom(16, 0, 8, 8),  // Bottom
-	rectFrom(0, 8, 8, 8),   // Right
-	rectFrom(8, 8, 8, 8),   // Front
-	rectFrom(16, 8, 8, 8),  // Left
-	rectFrom(24, 8, 8, 8),  // Back
+func get(skin Skin, image cuttableImage, part SkinPart, face Face) image.Image {
+	return image.SubImage(getModel(skin, part)[face].Add(positions[part]))
 }
 
-func (skin *Skin) Head(face Face) image.Image {
-	return skin.image.SubImage(head[face])
+func getOverlay(skin Skin, image cuttableImage, part SkinPart, face Face) image.Image {
+	return image.SubImage(getModel(skin, part)[face].Add(overlayPositions[part]))
 }
 
-// Helm
-var helm = [faceCount]image.Rectangle{
-	rectFrom(32, 0, 32, 16), // All
-	rectFrom(40, 0, 8, 8),   // Top
-	rectFrom(48, 0, 8, 8),   // Bottom
-	rectFrom(32, 8, 8, 8),   // Right
-	rectFrom(40, 8, 8, 8),   // Front
-	rectFrom(48, 8, 8, 8),   // Left
-	rectFrom(56, 8, 8, 8),   // Back
+func bounds(x, y int) image.Rectangle {
+	return relative(0, 0, x, y)
 }
 
-func (skin *Skin) Helm(face Face) image.Image {
-	return skin.image.SubImage(helm[face])
-}
-
-// Body
-var body = [faceCount]image.Rectangle{
-	rectFrom(16, 16, 24, 16), // All
-	rectFrom(20, 16, 8, 4),   // Top
-	rectFrom(28, 16, 8, 4),   // Bottom
-	rectFrom(16, 20, 4, 12),  // Right
-	rectFrom(20, 20, 8, 12),  // Front
-	rectFrom(28, 20, 4, 12),  // Left
-	rectFrom(32, 20, 8, 12),  // Back
-}
-
-func (skin *Skin) Body(face Face) image.Image {
-	return skin.image.SubImage(body[face])
-}
-
-// Arm
-var arm = [faceCount]image.Rectangle{
-	rectFrom(40, 16, 16, 16), // All
-	rectFrom(44, 16, 4, 4),   // Top
-	rectFrom(48, 16, 4, 4),   // Bottom
-	rectFrom(40, 20, 4, 12),  // Right
-	rectFrom(44, 20, 4, 12),  // Front
-	rectFrom(48, 20, 4, 12),  // Left
-	rectFrom(52, 20, 4, 12),  // Back
-}
-
-func (skin *Skin) Arm(face Face) image.Image {
-	return skin.image.SubImage(arm[face])
-}
-
-// Leg
-var leg = [faceCount]image.Rectangle{
-	rectFrom(0, 16, 16, 16), // All
-	rectFrom(4, 16, 4, 4),   // Top
-	rectFrom(8, 16, 4, 4),   // Bottom
-	rectFrom(0, 20, 4, 12),  // Right
-	rectFrom(4, 20, 4, 12),  // Front
-	rectFrom(8, 20, 4, 12),  // Left
-	rectFrom(12, 20, 4, 12), // Back
-}
-
-func (skin *Skin) Leg(face Face) image.Image {
-	return skin.image.SubImage(leg[face])
-}
-
-func rectFrom(x, y, width, height int) image.Rectangle {
+func relative(x, y, width, height int) image.Rectangle {
 	return image.Rect(x, y, x+width, y+height)
 }

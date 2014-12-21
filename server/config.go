@@ -3,7 +3,7 @@ package server
 import (
 	"encoding/json"
 	"github.com/LapisBlue/Lapitar/face"
-	"github.com/LapisBlue/Lapitar/head"
+	"github.com/LapisBlue/Lapitar/render"
 	"github.com/LapisBlue/Lapitar/util"
 	"github.com/disintegration/imaging"
 	"io"
@@ -47,7 +47,7 @@ func defaultConfig() *config {
 			&faceConfig{
 				&limitedInt{128, 512},
 				true,
-				&scaling{head.DefaultScale},
+				&scaling{render.DefaultScale},
 			},
 			-35,
 			4,

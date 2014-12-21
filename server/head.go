@@ -1,7 +1,7 @@
 package server
 
 import (
-	"github.com/LapisBlue/Lapitar/head"
+	"github.com/LapisBlue/Lapitar/render"
 	"github.com/LapisBlue/Lapitar/util"
 	"github.com/zenazn/goji/web"
 	"log"
@@ -12,8 +12,8 @@ func serveHead(c web.C, w http.ResponseWriter, r *http.Request, size int) {
 	watch := util.StartedWatch()
 
 	conf := defaults.Head
-	if size < head.MinimalSize {
-		size = head.MinimalSize
+	if size < render.MinimalSize {
+		size = render.MinimalSize
 	} else if size > conf.Size.Max {
 		size = conf.Size.Max
 	}
@@ -30,7 +30,7 @@ func serveHead(c web.C, w http.ResponseWriter, r *http.Request, size int) {
 	prepareResponse(w, r, skin)
 
 	watch.Mark()
-	result, err := head.Render(skin.Skin(), conf.Angle, size, size, conf.SuperSampling, conf.Helm, conf.Shadow, conf.Lighting, conf.Scale.Get())
+	result, err := render.RenderHead(skin.Skin(), conf.Angle, 20, -4.5, size, size, conf.SuperSampling, conf.Helm, conf.Shadow, conf.Lighting, conf.Scale.Get())
 	if err == nil {
 		log.Println("Rendered head:", player, watch)
 	} else {

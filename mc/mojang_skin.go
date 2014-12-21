@@ -18,7 +18,7 @@ func SkinURL(player string) string {
 	return fmt.Sprintf(skinURL, player)
 }
 
-func Download(player string) (skin *Skin, err error) {
+func Download(player string) (skin Skin, err error) {
 	var url string
 	url = fmt.Sprintf(skinURL, player)
 	// Char is only supported for compatibility with previous avatar services
@@ -55,5 +55,6 @@ func Download(player string) (skin *Skin, err error) {
 		return
 	}
 
-	return CreateSkin(img), nil
+	// TODO: Alex support
+	return CreateSkin(img, false), nil
 }

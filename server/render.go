@@ -57,10 +57,10 @@ func servePortraitWithSize(c web.C, w http.ResponseWriter, r *http.Request) {
 	serveRender(c, w, r, parseSize(c, defaults.Portrait.Size.Def), defaults.Portrait, true, false)
 }
 
-func serveBodyNormal(c web.C, w http.ResponseWriter, r *http.Request) {
+func servePlayerNormal(c web.C, w http.ResponseWriter, r *http.Request) {
 	serveRender(c, w, r, defaults.Body.Size.Def, defaults.Body, false, true)
 }
 
-func serveBodyWithSize(c web.C, w http.ResponseWriter, r *http.Request) {
+func servePlayerWithSize(c web.C, w http.ResponseWriter, r *http.Request) {
 	serveRender(c, w, r, parseSize(c, defaults.Body.Size.Def), defaults.Body, false, true)
 }

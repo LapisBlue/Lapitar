@@ -76,7 +76,7 @@ void renderPlayer(bool overlay, bool body) {
         glPushMatrix();
         bind(overlay ? TEXTURE_LEFT_ARM_OVERLAY : TEXTURE_LEFT_ARM);
         glTranslatef(1.75f, 0.1f, 0.0f);
-        glRotatef(-10.0f, 0.0f, 0.0f, 1.0f);
+        glRotatef(10.0f, 0.0f, 0.0f, 1.0f);
         draw(0.5f + offset, 1.5f + offset, 0.5f + offset, TEXTURE_TYPE_LIMB);
         glPopMatrix();
 

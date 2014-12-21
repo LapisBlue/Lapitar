@@ -35,7 +35,7 @@ void draw(float x, float y, float z, TextureType type) {
 
     if (type == TEXTURE_TYPE_NONE) {
         int i;
-        for (i = 0; i < vertice_count; i += 3) {
+        for (i = 0; i < vertex_count; i += 3) {
             glVertex3f(vertices[i] * x, vertices[i + 1] * y, vertices[i + 2] * z);
         }
     } else {

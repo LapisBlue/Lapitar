@@ -8,7 +8,7 @@ typedef enum Texture {
 } Texture;
 
 typedef enum TextureType {
-    TEXTURE_TYPE_NONE, TEXTURE_TYPE_HEAD, TEXTURE_TYPE_TORSO, TEXTURE_TYPE_LIMB
+    TEXTURE_TYPE_HEAD, TEXTURE_TYPE_TORSO, TEXTURE_TYPE_LIMB, TEXTURE_TYPE_NONE
 } TextureType;
 
 static const float u[3][24] = {
@@ -65,7 +65,7 @@ static const float v[3][24] = {
         }
 };
 
-static const int vertice_count = 72;
+static const int vertex_count = 72;
 
 static const float vertices[72] = {
 

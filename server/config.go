@@ -47,9 +47,9 @@ func defaultConfig() *config {
 	return &config{
 		":8088",
 		false,
-		newRenderConfig(-35, 20),
-		newRenderConfig(25, 10),
-		newRenderConfig(25, 10),
+		newRenderConfig(-35, 20, -4.5),
+		newRenderConfig(25, 10, -4.5),
+		newRenderConfig(25, 10, -6),
 		&faceConfig{
 			&limitedInt{128, 512},
 			&scaling{face.DefaultScale},
@@ -57,7 +57,7 @@ func defaultConfig() *config {
 	}
 }
 
-func newRenderConfig(angle, tilt float32) *renderConfig {
+func newRenderConfig(angle, tilt, zoom float32) *renderConfig {
 	return &renderConfig{
 		&faceConfig{
 			&limitedInt{128, 512},
@@ -66,7 +66,7 @@ func newRenderConfig(angle, tilt float32) *renderConfig {
 		true,
 		angle,
 		tilt,
-		-4.5,
+		zoom,
 		4,
 		true,
 		true,

@@ -137,6 +137,8 @@ public class TarRenderer {
 			GL11.glTranslatef(0,2.5f,-4.5f);
 		} else if (portrait) {
 			GL11.glTranslatef(0,1f,-2f);
+		} else {
+			GL11.glTranslatef(0, 0.25f, 0);
 		}
 		GL11.glTranslatef(0,0,zoom);
 		GL11.glRotatef(tilt,1.0f,0f,0.0f);

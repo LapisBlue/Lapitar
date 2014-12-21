@@ -58,6 +58,7 @@ public final class Tar {
 		parser.accepts("portrait", "Render the head, torso, and arms instead of just the head.");
 		parser.accepts("body", "Render the head, torso, arms, and legs instead of just the head.");
 		parser.accepts("isometric", "Render in ugly isometric mode instead of perspective mode.");
+		parser.accepts("alex", "Use the 'Alex' model (slim arms)");
 
 		OptionSet options;
 		try {
@@ -97,6 +98,7 @@ public final class Tar {
 					continuous,
 					options.has("isometric"),
 					options.has("body"),
+					options.has("alex"),
 					options.valueOf(zoom)
 			);
 			watch.stop();

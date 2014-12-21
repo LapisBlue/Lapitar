@@ -50,6 +50,7 @@ public class TarRenderer {
 	private final boolean portrait;
 	private final boolean body;
 	private final boolean isometric;
+	private final boolean slim;
 
 	private final boolean useWindow;
 	
@@ -63,7 +64,7 @@ public class TarRenderer {
 						int width, int height, int superSampling, // Size
 						boolean helmet, boolean shadow, boolean lighting, // Flags A
 						boolean portrait, boolean useWindow, boolean isometric, // Flags B
-						boolean body, // Flags C
+						boolean body, boolean slim, // Flags C
 						float zoom) { // Values
 			
 		this.angle = angle;
@@ -81,6 +82,7 @@ public class TarRenderer {
 		this.isometric = isometric;
 		this.body = body;
 		this.zoom = zoom;
+		this.slim = slim;
 	}
 
 	public BufferedImage render(BufferedImage skin) throws Exception {
@@ -219,16 +221,16 @@ public class TarRenderer {
 				
 				GL11.glPushMatrix();
 					bind(RIGHTARM_TEXTURE + (outer ? 1 : 0));
-					GL11.glTranslatef(-1.75f, 0.1f, 0f);
+					GL11.glTranslatef(-1.75f+(slim?0.125f:0), 0.1f, 0f);
 					GL11.glRotatef(-10, 0f, 0f, 1f);
-					draw(0.5f + ofs, 1.5f + ofs, 0.5f + ofs, TextureType.LIMB);
+					draw((slim ? 0.375f : 0.5f) + ofs, 1.5f + ofs, 0.5f + ofs, slim ? TextureType.SLIM_LIMB : TextureType.LIMB);
 				GL11.glPopMatrix();
 		
 				GL11.glPushMatrix();
 					bind(LEFTARM_TEXTURE + (outer ? 1 : 0));
-					GL11.glTranslatef(1.75f, 0.1f, 0f);
+					GL11.glTranslatef(1.75f-(slim?0.125f:0), 0.1f, 0f);
 					GL11.glRotatef(10, 0f, 0f, 1f);
-					draw(0.5f + ofs, 1.5f + ofs, 0.5f + ofs, TextureType.LIMB);
+					draw((slim ? 0.375f : 0.5f) + ofs, 1.5f + ofs, 0.5f + ofs, slim ? TextureType.SLIM_LIMB : TextureType.LIMB);
 				GL11.glPopMatrix();
 				
 			GL11.glPopMatrix();

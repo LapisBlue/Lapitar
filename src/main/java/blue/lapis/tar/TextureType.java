@@ -48,6 +48,21 @@ public enum TextureType {
 		8, 4, 4, 12,
 		// Right (Green)
 		0, 4, 4, 12
+	),
+	SLIM_LIMB(
+		16, 16,
+		// Front (Red)
+		4, 4, 3, 12,
+		// Back (Blue)
+		11, 4, 3, 12,
+		// Top (Purple)
+		4, 0, 3, 4,
+		// Bottom (Gray)
+		7, 0, 3, 4,
+		// Left (Yellow)
+		7, 4, 4, 12,
+		// Right (Green)
+		0, 4, 4, 12
 	);
 	
 	public final float[] u = new float[24];

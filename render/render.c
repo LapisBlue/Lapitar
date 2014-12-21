@@ -90,7 +90,7 @@ void renderPlayer(bool overlay, bool body) {
         glPopMatrix();
     }
 
-    bind(overlay ? TEXTURE_HEAD : TEXTURE_HEAD_OVERLAY);
+    bind(overlay ? TEXTURE_HEAD_OVERLAY : TEXTURE_HEAD);
     draw(1.0f + offset, 1.0f + offset, 1.0f + offset, TEXTURE_TYPE_HEAD);
 }
 

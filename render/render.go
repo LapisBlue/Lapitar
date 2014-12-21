@@ -101,7 +101,7 @@ func prepare(sk mc.Skin, part mc.SkinPart) *image.RGBA {
 
 func prepareOverlay(sk mc.Skin, part mc.SkinPart) *image.RGBA {
 	image := sk.Overlay(part)
-	if util.IsSolidColor(image) {
+	if image == nil || util.IsSolidColor(image) {
 		return empty[mc.Model(sk, part)[0]]
 	} else {
 		return prepareUpload(image)

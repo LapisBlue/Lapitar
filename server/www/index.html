@@ -1,9 +1,89 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/bootswatch/3.3.1.2/flatly/bootstrap.min.css">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/fontawesome/4.2.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="lapitar.css">
+
+    <link rel="icon" href="//tar.lapis.blue/avatar/32/Aesen_.png">
+
     <title>Lapitar</title>
 </head>
 <body>
-    <p>Hello!</p>
+    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/">Lapitar</a>
+            </div>
+            <div class="collapse navbar-collapse">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="/"><i class="fa fa-home"></i> Home</a></li>
+                    <li><a href="https://github.com/LapisBlue/Lapitar"><i class="fa fa-github"></i> GitHub</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="row">
+            <h4>Lapitar is a new <strong>open source</strong> Minecraft avatar service, providing 2D and 3D avatars with a simple API.</h4>
+            <div class="col-md-2"><img src="//tar.lapis.blue/avatar/256/Aesen_" title="Aesen"></div>
+            <div class="col-md-2"><img src="//tar.lapis.blue/avatar/256/Notch" title="Notch"></div>
+            <div class="col-md-2"><img src="//tar.lapis.blue/avatar/256/Dinnerbone" title="Dinnerbone"></div>
+            <div class="col-md-2"><img src="//tar.lapis.blue/avatar/256/md_5" title="md_5"></div>
+            <div class="col-md-2"><img src="//tar.lapis.blue/avatar/256/sk89q" title="sk89q"></div>
+            <div class="col-md-2"><img src="//tar.lapis.blue/avatar/256/Minecrell" title="Minecrell"></div>
+        </div>
+        <hr>
+        <h2>Faces</h2>
+        <div class="row">
+            <div class="col-md-8">
+                <p>A simple, flat avatar with only the face of the player's skin.</p>
+                <pre>https://tar.lapis.blue/face/[size]/&lt;player&gt;[.png]</pre>
+                <h4>Example:</h4>
+                <pre>https://tar.lapis.blue/face/128/Aesen_.png</pre>
+            </div>
+            <div class="col-md-2"><img class="pixelated" src="//tar.lapis.blue/face/128/Minecrell"></div>
+            <div class="col-md-2"><img class="pixelated" src="//tar.lapis.blue/face/128/Aesen_"></div>
+        </div>
+        <hr>
+        <h2>Heads</h2>
+        <div class="row">
+            <div class="col-md-8">
+                <p>A perspective avatar with the head of the player's skin.</p>
+                <pre>https://tar.lapis.blue/avatar/[size]/&lt;player&gt;[.png]</pre>
+                <h4>Example:</h4>
+                <pre>https://tar.lapis.blue/avatar/128/Aesen_.png</pre>
+            </div>
+            <div class="col-md-2"><img src="//tar.lapis.blue/avatar/256/Minecrell"></div>
+            <div class="col-md-2"><img src="//tar.lapis.blue/avatar/256/Aesen_"></div>
+        </div>
+        <hr>
+        <h2>Skins</h2>
+        <div class="row">
+            <div class="col-md-8">
+                <p>The raw skin of the player. This will return the player's skin as-is, with no modifications.</p>
+                <pre>https://tar.lapis.blue/skin/&lt;player&gt;[.png]</pre>
+                <h4>Example:</h4>
+                <pre>https://tar.lapis.blue/skin/Aesen_.png</pre>
+            </div>
+            <div class="col-md-2"><img class="pixelated" src="//tar.lapis.blue/skin/Minecrell"></div>
+            <div class="col-md-2"><img class="pixelated" src="//tar.lapis.blue/skin/Aesen_"></div>
+        </div>
+        <hr>
+        <footer>
+            <a href="https://tar.lapis.blue">Lapitar</a> is an open source <a href="http://lapis.blue">Lapis project</a> available under the <a href="https://github.com/LapisBlue/Lapitar/blob/master/LICENSE">MIT License</a>.
+            Made by <a href="https://github.com/Minecrell">Minecrell</a> and <a href="https://github.com/AesenV">Aesen</a>.
+        </footer>
+    </div>
 </body>
 </html>

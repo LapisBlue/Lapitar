@@ -12,6 +12,7 @@ import (
 const (
 	serverConfig = "lapitar.json"
 	cacheFolder  = "caches"
+	wwwFolder    = "src/github.com/LapisBlue/Lapitar/server/www"
 )
 
 func Run(name string, args []string) int {
@@ -20,6 +21,7 @@ func Run(name string, args []string) int {
 	dir := flags.StringP("dir", "d", ".", "The folder to save all files in.")
 	config := flags.StringP("config", "c", serverConfig, "The configuration file used to configure the server.")
 	cacheDir := flags.String("cache", cacheFolder, "The folder to cache rendered images in.")
+	wwwDir := flags.String("www", filepath.Join(os.Getenv("GOPATH"), wwwFolder), "The folder with the website files.")
 
 	cli.FlagUsage(name, flags)
 
@@ -45,7 +47,7 @@ func Run(name string, args []string) int {
 
 	cache.Init(*cacheDir)
 
-	start(conf)
+	start(conf, *wwwDir)
 	return 0 // TODO: What if the above fails?
 }
 

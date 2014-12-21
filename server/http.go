@@ -5,7 +5,9 @@ import (
 	"github.com/zenazn/goji"
 	"github.com/zenazn/goji/web"
 	"github.com/zenazn/goji/web/middleware"
+	"log"
 	"net/http"
+	"os"
 )
 
 var (
@@ -13,7 +15,7 @@ var (
 	//decoder  = schema.NewDecoder()
 )
 
-func start(conf *config) {
+func start(conf *config, www string) {
 	defaults = conf
 	flag.Set("bind", conf.Address) // Uh, I guess that's a bit strange
 	if conf.Proxy {
@@ -32,9 +34,22 @@ func start(conf *config) {
 	register("/head/:player", serveHeadNormal)
 	register("/head/:size/:player", serveHeadWithSize)
 
-	goji.Get("/*", http.FileServer(http.Dir("www"))) // TODO: How to find the correct dir?
+	if exists(www) {
+		goji.Get("/*", http.FileServer(http.Dir(www)))
+	} else {
+		log.Println("Failed to find website files at", www)
+	}
 
 	goji.Serve()
+}
+
+func exists(dir string) bool {
+	stat, err := os.Stat(dir)
+	if err != nil {
+		return false
+	}
+
+	return stat.IsDir()
 }
 
 func register(pattern string, handler interface{}) {

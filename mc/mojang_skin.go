@@ -9,9 +9,17 @@ import (
 const (
 	LegacyURL = "http://skins.minecraft.net/MinecraftSkins/%s.png"
 	// TODO: skinServer = "texture.minecraft.net"
-	Steve = "https://minecraft.net/images/steve.png"
-	Alex  = "https://minecraft.net/images/alex.png"
+	steveURL = "https://minecraft.net/images/steve.png"
+	alexURL  = "https://minecraft.net/images/alex.png"
 )
+
+func Steve() (sk Skin, err error) {
+	return DownloadSkin(steveURL, false)
+}
+
+func Alex() (sk Skin, err error) {
+	return DownloadSkin(alexURL, true)
+}
 
 func SkinURL(player string) string {
 	return fmt.Sprintf(LegacyURL, player)

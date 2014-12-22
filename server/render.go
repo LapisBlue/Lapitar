@@ -6,7 +6,6 @@ import (
 	"github.com/zenazn/goji/web"
 	"log"
 	"net/http"
-	"math"
 )
 
 func serveRender(c web.C, w http.ResponseWriter, r *http.Request, size int, conf *renderConfig, portrait, full bool) {
@@ -30,11 +29,11 @@ func serveRender(c web.C, w http.ResponseWriter, r *http.Request, size int, conf
 	prepareResponse(w, r, skin)
 
 	watch.Mark()
-	sizeY := size
+	sizeX := size
 	if full {
-		sizeY = int(math.Floor(float64(sizeY)*1.625))
+		sizeX = int(float64(sizeX) / 1.625)
 	}
-	result, err := render.Render(skin.Skin(), conf.Angle, conf.Tilt, conf.Zoom, size, sizeY, conf.SuperSampling, portrait, full, conf.Overlay, conf.Shadow, conf.Lighting, conf.Scale.Get())
+	result, err := render.Render(skin.Skin(), conf.Angle, conf.Tilt, conf.Zoom, sizeX, size, conf.SuperSampling, portrait, full, conf.Overlay, conf.Shadow, conf.Lighting, conf.Scale.Get())
 	if err == nil {
 		log.Println("Rendered head:", player, watch)
 	} else {

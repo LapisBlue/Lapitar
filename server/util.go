@@ -33,6 +33,22 @@ func parseSize(c web.C, def int) (result int) {
 
 func downloadSkin(name string, watch *util.StopWatch) (skin mc.Skin) {
 	watch.Mark()
+	if !mc.IsUUID(name) {
+		if !mc.IsName(name) {
+			panic("NO NAME")
+		}
+
+		profile, err := mc.FetchProfile(name)
+		if err != nil {
+			panic(err)
+		}
+		if profile == nil {
+			panic("NO PROFILE")
+		}
+
+		name = profile.UUID()
+	}
+
 	profile, err := mc.FetchSkin(name)
 	if err != nil {
 		panic(err)
@@ -44,6 +60,7 @@ func downloadSkin(name string, watch *util.StopWatch) (skin mc.Skin) {
 	if err != nil {
 		panic(err)
 	}
+
 	log.Println("Loaded skin:", name, watch)
 	return
 }

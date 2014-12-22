@@ -19,18 +19,18 @@ func serveFace(c web.C, w http.ResponseWriter, r *http.Request, size int, overla
 	}
 
 	player := c.URLParams["player"]
-	meta := loadSkinMeta(player, watch)
+	/*meta := loadSkinMeta(player, watch)
 
 	// Check if we can return 304 Not Modified
 	if serveCached(w, r, meta) {
 		return
-	}
+	}*/
 
-	skin := downloadSkin(meta, watch)
-	prepareResponse(w, r, skin)
+	skin := downloadSkin(player, watch)
+	prepareResponse(w, r)
 
 	watch.Mark()
-	result := face.Render(skin.Skin(), size, overlay, conf.Scale.Get())
+	result := face.Render(skin, size, overlay, conf.Scale.Get())
 	log.Println("Rendered face:", player, watch)
 
 	sendResult(w, player, result, watch)

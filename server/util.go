@@ -33,7 +33,7 @@ func parseSize(c web.C, def int) (result int) {
 
 func downloadSkin(name string, watch *util.StopWatch) (skin mc.Skin) {
 	watch.Mark()
-	skin, err := mc.Download(name)
+	skin, err := mc.DownloadSkin(mc.SkinURL(name), false)
 	if err != nil {
 		panic(err)
 	}

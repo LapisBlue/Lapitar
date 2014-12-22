@@ -100,7 +100,7 @@ func downloadSkins(players []string) (result []mc.Skin) {
 	var err error
 	for i, player := range players {
 		watch.Mark()
-		result[i], err = mc.Download(player)
+		result[i], err = mc.DownloadSkin(mc.SkinURL(player), false)
 		if err != nil {
 			PrintError(err, "Failed to download skin:", player, watch)
 			continue

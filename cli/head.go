@@ -62,7 +62,7 @@ func runHead(name string, args []string) int {
 		}
 
 		player := players[0]
-		skin, err := mc.Download(player)
+		skin, err := mc.DownloadSkin(mc.SkinURL(player), false)
 		if err != nil {
 			return PrintError(err, "Failed to download skin:", player)
 		}

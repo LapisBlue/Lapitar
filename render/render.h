@@ -13,7 +13,7 @@ bool Render(
         float angle, float tilt, float zoom,
         bool shadow, bool lighting,
         bool portrait, bool full,
-        bool overlay, bool newSkin,
+        bool overlay, bool newSkin, bool alex,
         Image result,
         Image head, Image *headOverlay,
         Image *body, Image *bodyOverlay,

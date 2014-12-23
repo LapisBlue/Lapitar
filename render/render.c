@@ -51,7 +51,7 @@ void draw(float x, float y, float z, TextureType type) {
     glPopMatrix();
 }
 
-void renderPlayer(bool overlay, bool body) {
+void renderPlayer(bool overlay, bool body, bool alex) {
     float offset = overlay ? 0.05f : 0.0f;
 
     if (body) {
@@ -75,16 +75,16 @@ void renderPlayer(bool overlay, bool body) {
 
         glPushMatrix();
         bind(overlay ? TEXTURE_LEFT_ARM_OVERLAY : TEXTURE_LEFT_ARM);
-        glTranslatef(1.75f, 0.1f, 0.0f);
+        glTranslatef(alex ? 1.75f - 0.125f : 1.75f, 0.1f, 0.0f);
         glRotatef(10.0f, 0.0f, 0.0f, 1.0f);
-        draw(0.5f + offset, 1.5f + offset, 0.5f + offset, TEXTURE_TYPE_LIMB);
+        draw((alex ? 0.375f : 0.5f) + offset, 1.5f + offset, 0.5f + offset, alex ? TEXTURE_TYPE_ALEX : TEXTURE_TYPE_LIMB);
         glPopMatrix();
 
         glPushMatrix();
         bind(overlay ? TEXTURE_RIGHT_ARM_OVERLAY : TEXTURE_RIGHT_ARM);
-        glTranslatef(-1.75f, 0.1f, 0.0f);
+        glTranslatef(alex ? -1.75f + 0.125f : -1.75f, 0.1f, 0.0f);
         glRotatef(-10.0f, 0.0f, 0.0f, 1.0f);
-        draw(0.5f + offset, 1.5f + offset, 0.5f + offset, TEXTURE_TYPE_LIMB);
+        draw((alex ? 0.375f : 0.5f) + offset, 1.5f + offset, 0.5f + offset, alex ? TEXTURE_TYPE_ALEX : TEXTURE_TYPE_LIMB);
         glPopMatrix();
 
         glPopMatrix();
@@ -98,7 +98,7 @@ bool Render(
         float angle, float tilt, float zoom,
         bool shadow, bool lighting,
         bool portrait, bool full,
-        bool overlay, bool newSkin,
+        bool overlay, bool newSkin, bool alex,
         Image result,
         Image head, Image *headOverlay,
         Image *body, Image *bodyOverlay,
@@ -208,9 +208,9 @@ bool Render(
 
         glEnable(GL_TEXTURE_2D);
         glColor3f(1, 1, 1);
-        renderPlayer(false, portrait);
+        renderPlayer(false, portrait, alex);
         if (overlay) {
-            renderPlayer(true, portrait && newSkin);
+            renderPlayer(true, portrait && newSkin, alex);
         }
 
         glPopMatrix();

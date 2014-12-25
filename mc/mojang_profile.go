@@ -22,6 +22,10 @@ func (p mojangProfile) UUID() string {
 	return p.ProfileId
 }
 
+func (p mojangProfile) IsAlex() bool {
+	return IsAlex(p.ProfileId)
+}
+
 func FetchProfile(player string) (p Profile, err error) {
 	// TODO: Is validation necessary here?
 

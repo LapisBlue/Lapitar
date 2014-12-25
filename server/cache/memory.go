@@ -160,12 +160,14 @@ func (meta *memorySkinMeta) Download() (sk mc.Skin, err error) {
 		return meta.skin, nil
 	}
 
-	if meta.loader != nil {
-		result := <-meta.loader
-		meta.loader <- result
+	loader := meta.loader
+
+	if loader != nil {
+		result := <-loader
+		loader <- result
 		return result.skin, result.err
 	}
-	loader := make(chan skinResult, 1)
+	loader = make(chan skinResult, 1)
 	meta.loader = loader
 
 	sk, err = meta.meta.Download()
@@ -176,6 +178,7 @@ func (meta *memorySkinMeta) Download() (sk mc.Skin, err error) {
 
 	meta.skin = sk
 	loader <- skinResult{sk, nil}
+	meta.loader = nil
 	return
 }
 

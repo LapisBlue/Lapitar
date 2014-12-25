@@ -125,8 +125,8 @@ func (cache *memorySkinCache) pullSkin(uuid string) SkinMeta {
 func (cache *memorySkinCache) pushSkin(profile mc.Profile, meta SkinMeta) {
 	cache.skinsLock.Lock()
 	defer cache.skinsLock.Unlock()
-	cache.skins[profile.UUID()] = meta
-	cache.skins[profile.Name()] = meta
+	cache.skins[mc.ToLower(profile.UUID())] = meta
+	cache.skins[mc.ToLower(profile.Name())] = meta
 }
 
 func (cache *memorySkinCache) pullSkinLoader(uuid string) chan skinMetaResult {
@@ -172,6 +172,7 @@ func (meta *memorySkinMeta) Download() (sk mc.Skin, err error) {
 	}
 
 	meta.skin = sk
+	loader <- skinResult{sk, nil}
 	return
 }
 

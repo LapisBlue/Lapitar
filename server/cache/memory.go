@@ -53,6 +53,7 @@ func (cache *memorySkinCache) FetchByName(name string) (skin SkinMeta, err error
 
 	if loader != nil {
 		result := <-loader
+		loader <- result
 		return result.meta, result.err
 	}
 
@@ -84,6 +85,7 @@ func (cache *memorySkinCache) Fetch(uuid string) (skin SkinMeta, err error) {
 
 	if loader != nil {
 		result := <-loader
+		loader <- result
 		return result.meta, result.err
 	}
 
@@ -160,6 +162,7 @@ func (meta *memorySkinMeta) Download() (sk mc.Skin, err error) {
 
 	if meta.loader != nil {
 		result := <-meta.loader
+		meta.loader <- result
 		return result.skin, result.err
 	}
 	loader := make(chan skinResult, 1)

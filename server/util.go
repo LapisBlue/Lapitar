@@ -36,12 +36,15 @@ func loadSkinMeta(name string, watch *util.StopWatch) (skin cache.SkinMeta) {
 	watch.Mark()
 
 	var err error
-	if mc.IsUUID(name) {
-		skin, err = cache.Fetch(name)
-	} else if mc.IsName(name) {
+	if mc.IsName(name) {
 		skin, err = cache.FetchByName(name)
 	} else {
-		panic("INVALID NAME")
+		name = mc.ParseUUID(name)
+		if mc.IsUUID(name) {
+			skin, err = cache.Fetch(name)
+		} else {
+			panic("INVALID NAME") // TODO
+		}
 	}
 
 	if err != nil {

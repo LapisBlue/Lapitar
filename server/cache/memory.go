@@ -68,12 +68,7 @@ func (cache *memorySkinCache) FetchByName(name string) (skin SkinMeta, err error
 	skin, err = Fetch(profile.UUID())
 	loader <- skinMetaResult{skin, err}
 
-	if err == nil {
-		go cache.pushSkin(name, skin)
-	}
-
 	go cache.pushUUIDLoader(name, nil)
-
 	return
 }
 
@@ -104,7 +99,7 @@ func (cache *memorySkinCache) Fetch(uuid string) (skin SkinMeta, err error) {
 	skin = &memorySkinMeta{sk.Profile(), sk.Skin(), time.Now(), nil, nil}
 	loader <- skinMetaResult{skin, nil}
 
-	go cache.pushSkin(uuid, skin)
+	go cache.pushSkin(sk.Profile(), skin)
 	go cache.pushSkinLoader(uuid, nil)
 	return
 }
@@ -127,10 +122,11 @@ func (cache *memorySkinCache) pullSkin(uuid string) SkinMeta {
 	return cache.skins[uuid]
 }
 
-func (cache *memorySkinCache) pushSkin(uuid string, meta SkinMeta) {
+func (cache *memorySkinCache) pushSkin(profile mc.Profile, meta SkinMeta) {
 	cache.skinsLock.Lock()
 	defer cache.skinsLock.Unlock()
-	cache.skins[uuid] = meta
+	cache.skins[profile.UUID()] = meta
+	cache.skins[profile.Name()] = meta
 }
 
 func (cache *memorySkinCache) pullSkinLoader(uuid string) chan skinMetaResult {

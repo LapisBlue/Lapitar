@@ -2,6 +2,7 @@ package server
 
 import (
 	"github.com/LapisBlue/Lapitar/mc"
+	"github.com/LapisBlue/Lapitar/server/cache"
 	"github.com/LapisBlue/Lapitar/util"
 	"github.com/zenazn/goji/web"
 	"image"
@@ -31,37 +32,23 @@ func parseSize(c web.C, def int) (result int) {
 	return
 }
 
-func downloadSkin(name string, watch *util.StopWatch) (skin mc.Skin) {
+func loadSkinMeta(name string, watch *util.StopWatch) (skin cache.SkinMeta) {
 	watch.Mark()
-	if !mc.IsUUID(name) {
-		if !mc.IsName(name) {
-			panic("NO NAME")
-		}
 
-		profile, err := mc.FetchProfile(name)
-		if err != nil {
-			panic(err)
-		}
-		if profile == nil {
-			panic("NO PROFILE")
-		}
-
-		name = profile.UUID()
+	var err error
+	if mc.IsUUID(name) {
+		skin, err = cache.Fetch(name)
+	} else if mc.IsName(name) {
+		skin, err = cache.FetchByName(name)
+	} else {
+		panic("INVALID NAME")
 	}
 
-	profile, err := mc.FetchSkin(name)
-	if err != nil {
-		panic(err)
-	}
-	if profile == nil {
-		panic("NO SKIN")
-	}
-	skin, err = profile.Skin().Download()
 	if err != nil {
 		panic(err)
 	}
 
-	log.Println("Loaded skin:", name, watch)
+	log.Println("Loaded skin:", skin.Profile().Name(), watch)
 	return
 }
 
@@ -70,21 +57,21 @@ const (
 	cacheControl = "max-age=86400" // 24*60*60, one day in seconds
 )
 
-func serveCached(w http.ResponseWriter, r *http.Request) bool {
-	/*if tag := r.Header.Get("If-None-Match"); tag == meta.ID() {
-		prepareResponse(w, r)
+func serveCached(w http.ResponseWriter, r *http.Request, meta cache.SkinMeta) bool {
+	if tag := r.Header.Get("If-None-Match"); tag == meta.ID() {
+		prepareResponse(w, r, meta)
 		w.WriteHeader(http.StatusNotModified)
 		return true
-	}*/
+	}
 
 	return false
 }
 
-func prepareResponse(w http.ResponseWriter, r *http.Request) {
+func prepareResponse(w http.ResponseWriter, r *http.Request, meta cache.SkinMeta) {
 	w.Header().Add("Cache-Control", cacheControl)
 	w.Header().Add("Expires", time.Now().Add(keepCache).UTC().Format(http.TimeFormat))
-	/*w.Header().Add("ETag", meta.ID())
-	w.Header().Add("Last-Modified", meta.LastMod().UTC().Format(http.TimeFormat))*/
+	w.Header().Add("ETag", meta.ID())
+	//w.Header().Add("Last-Modified", meta.LastMod().UTC().Format(http.TimeFormat))
 }
 
 func sendResult(w http.ResponseWriter, player string, result image.Image, watch *util.StopWatch) (err error) {

@@ -15,6 +15,10 @@ type mojangSkinProfile struct {
 	ProfileSkin mojangSkinMeta `json:"properties"`
 }
 
+func (p mojangSkinProfile) Profile() Profile {
+	return p.mojangProfile
+}
+
 func (p mojangSkinProfile) Skin() SkinMeta {
 	return p.ProfileSkin
 }

@@ -3,7 +3,7 @@ package mc
 import "strings"
 
 func ParseUUID(uuid string) string {
-	return strings.Replace(uuid, "-", "", -1)
+	return strings.Replace(ToLower(uuid), "-", "", -1)
 }
 
 func IsUUID(uuid string) bool {

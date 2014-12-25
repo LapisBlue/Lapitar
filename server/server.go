@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"github.com/LapisBlue/Lapitar/cli"
+	"github.com/LapisBlue/Lapitar/server/cache"
 	"github.com/ogier/pflag"
 	"os"
 	"path/filepath"
@@ -43,6 +44,8 @@ func Run(name string, args []string) int {
 	if conf == nil {
 		return exit
 	}
+
+	cache.Init(cache.Memory())
 
 	start(conf, *wwwDir)
 	return 0 // TODO: What if the above fails?

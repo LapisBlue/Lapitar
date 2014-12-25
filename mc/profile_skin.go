@@ -2,6 +2,7 @@ package mc
 
 type SkinProfile interface {
 	Profile
+	Profile() Profile
 	Skin() SkinMeta
 }
 

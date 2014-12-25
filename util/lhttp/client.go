@@ -12,7 +12,7 @@ import (
 
 const (
 	userAgent = util.DisplayName
-	timeout   = 10 * time.Second // Wait max. 10 seconds on the response
+	timeout   = 10 * time.Second // Wait max. 10 seconds for the response
 
 	TypeJSON = "application/json"
 	TypePNG  = "image/png"

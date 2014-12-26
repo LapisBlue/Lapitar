@@ -1,6 +1,6 @@
 package cache
 
-import "github.com/LapisBlue/Lapitar/mc"
+import "github.com/LapisBlue/Lapitar/lapitar/mc"
 
 func Fallback(profile mc.Profile) SkinMeta {
 	var handle *defaultSkinMeta

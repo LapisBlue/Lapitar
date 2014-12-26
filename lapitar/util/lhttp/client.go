@@ -2,7 +2,7 @@ package lhttp
 
 import (
 	"errors"
-	"github.com/LapisBlue/Lapitar/util"
+	"github.com/LapisBlue/Lapitar/lapitar"
 	"io"
 	"net/http"
 	"net/url"
@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	userAgent = util.DisplayName
+	userAgent = lapitar.DisplayName
 	timeout   = 10 * time.Second // Wait max. 10 seconds for the response
 
 	TypeJSON = "application/json"

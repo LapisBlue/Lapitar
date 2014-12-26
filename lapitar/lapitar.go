@@ -1,4 +1,4 @@
-package util
+package lapitar
 
 const (
 	Name        = "Lapitar"

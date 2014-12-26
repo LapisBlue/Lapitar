@@ -1,8 +1,8 @@
 package server
 
 import (
-	"github.com/LapisBlue/Lapitar/face"
-	"github.com/LapisBlue/Lapitar/util"
+	"github.com/LapisBlue/Lapitar/lapitar/face"
+	"github.com/LapisBlue/Lapitar/lapitar/util"
 	"github.com/zenazn/goji/web"
 	"log"
 	"net/http"

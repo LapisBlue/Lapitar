@@ -2,9 +2,9 @@ package server
 
 import (
 	"encoding/json"
-	"github.com/LapisBlue/Lapitar/face"
-	"github.com/LapisBlue/Lapitar/render"
-	"github.com/LapisBlue/Lapitar/util"
+	"github.com/LapisBlue/Lapitar/lapitar/face"
+	"github.com/LapisBlue/Lapitar/lapitar/render"
+	"github.com/LapisBlue/Lapitar/lapitar/util"
 	"github.com/disintegration/imaging"
 	"io"
 )

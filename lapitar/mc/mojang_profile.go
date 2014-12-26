@@ -2,7 +2,7 @@ package mc
 
 import (
 	"encoding/json"
-	"github.com/LapisBlue/Lapitar/util/lhttp"
+	"github.com/LapisBlue/Lapitar/lapitar/util/lhttp"
 )
 
 const (

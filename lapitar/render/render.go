@@ -5,8 +5,8 @@ package render
 import "C"
 import (
 	"errors"
-	"github.com/LapisBlue/Lapitar/mc"
-	"github.com/LapisBlue/Lapitar/util"
+	"github.com/LapisBlue/Lapitar/lapitar/mc"
+	"github.com/LapisBlue/Lapitar/lapitar/util"
 	"github.com/disintegration/imaging"
 	"image"
 	"image/color"

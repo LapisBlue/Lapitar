@@ -2,7 +2,7 @@ package mc
 
 import (
 	"fmt"
-	"github.com/LapisBlue/Lapitar/util/lhttp"
+	"github.com/LapisBlue/Lapitar/lapitar/util/lhttp"
 	"image/png"
 	"io"
 	"net/http"

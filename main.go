@@ -4,16 +4,13 @@ import (
 	"fmt"
 	"github.com/LapisBlue/Lapitar/cli"
 	"github.com/LapisBlue/Lapitar/server"
-	"math/rand"
 	"os"
 	"path/filepath"
 	"runtime"
-	"time"
 )
 
 func init() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
-	rand.Seed(time.Now().UTC().UnixNano())
 }
 
 var usage = cli.Usage().

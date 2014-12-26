@@ -32,11 +32,12 @@ func serveRender(c web.C, w http.ResponseWriter, r *http.Request, size int, conf
 	prepareResponse(w, r, meta)
 
 	watch.Mark()
-	sizeX := size
+	sizeY := size
 	if full {
-		sizeX = int(float64(sizeX) / 1.625)
+		sizeY = int(float64(sizeY) * 1.625)
 	}
-	result, err := render.Render(skin, conf.Angle, conf.Tilt, conf.Zoom, sizeX, size, conf.SuperSampling, portrait, full, conf.Overlay, conf.Shadow, conf.Lighting, conf.Scale.Get())
+
+	result, err := render.Render(skin, conf.Angle, conf.Tilt, conf.Zoom, size, sizeY, conf.SuperSampling, portrait, full, conf.Overlay, conf.Shadow, conf.Lighting, conf.Scale.Get())
 	if err == nil {
 		log.Println("Rendered head:", player, watch)
 	} else {

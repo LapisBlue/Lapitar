@@ -17,10 +17,7 @@ func serveSkin(c web.C, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	skin, err := meta.Download()
-	if err != nil {
-		panic(err)
-	}
+	meta, skin := meta.Fetch()
 	prepareResponse(w, r, meta)
 
 	sendResult(w, player, skin.Image(), watch)

@@ -35,20 +35,15 @@ func parseSize(c web.C, def int) (result int) {
 func loadSkinMeta(name string, watch *util.StopWatch) (skin cache.SkinMeta) {
 	watch.Mark()
 
-	var err error
 	if mc.IsName(name) {
-		skin, err = cache.FetchByName(name)
+		skin = cache.FetchByName(name)
 	} else {
 		name = mc.ParseUUID(name)
 		if mc.IsUUID(name) {
-			skin, err = cache.Fetch(name)
+			skin = cache.Fetch(name)
 		} else {
-			panic("INVALID NAME") // TODO
+			skin = cache.FallbackByName(name)
 		}
-	}
-
-	if err != nil {
-		panic(err)
 	}
 
 	log.Println("Loaded skin:", skin.Profile().Name(), watch)

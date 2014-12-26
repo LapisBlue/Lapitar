@@ -3,6 +3,8 @@ package mc
 import "testing"
 
 func TestNames(t *testing.T) {
+	Steve()
+
 	assert(t, IsName("Minecrell"))
 	assert(t, IsName("Pande"))
 	assert(t, IsName("Aesen_"))

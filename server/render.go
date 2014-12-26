@@ -25,10 +25,7 @@ func serveRender(c web.C, w http.ResponseWriter, r *http.Request, size int, conf
 		return
 	}
 
-	skin, err := meta.Download()
-	if err != nil {
-		panic(err)
-	}
+	meta, skin := meta.Fetch()
 	prepareResponse(w, r, meta)
 
 	watch.Mark()

@@ -4,28 +4,39 @@ import (
 	"fmt"
 	"github.com/LapisBlue/Lapitar/util/lhttp"
 	"image/png"
+	"io"
+	"net/http"
 )
 
 const (
 	LegacyURL = "http://skins.minecraft.net/MinecraftSkins/%s.png"
 	// TODO: skinServer = "texture.minecraft.net"
-	steveURL = "https://minecraft.net/images/steve.png"
-	alexURL  = "https://minecraft.net/images/alex.png"
 )
-
-func Steve() (sk Skin, err error) {
-	return DownloadSkin(steveURL, false)
-}
-
-func Alex() (sk Skin, err error) {
-	return DownloadSkin(alexURL, true)
-}
 
 func SkinURL(player string) string {
 	return fmt.Sprintf(LegacyURL, player)
 }
 
 func DownloadSkin(url string, alex bool) (sk Skin, err error) {
+	resp, err := requestSkin(url)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+	return readSkin(resp.Body, alex)
+}
+
+func readSkin(reader io.Reader, alex bool) (sk Skin, err error) {
+	img, err := png.Decode(reader)
+	if err != nil {
+		return
+	}
+
+	sk = CreateSkin(img, alex)
+	return
+}
+
+func requestSkin(url string) (resp *http.Response, err error) {
 	req, err := lhttp.Get(url)
 	if err != nil {
 		return
@@ -33,11 +44,16 @@ func DownloadSkin(url string, alex bool) (sk Skin, err error) {
 
 	req.Header.Set("Accept", lhttp.TypePNG)
 
-	resp, err := lhttp.Do(req)
+	resp, err = lhttp.Do(req)
 	if err != nil {
 		return
 	}
-	defer resp.Body.Close()
+
+	defer func() {
+		if err != nil {
+			resp.Body.Close()
+		}
+	}()
 
 	err = lhttp.ExpectSuccess(resp)
 	if err != nil {
@@ -45,16 +61,6 @@ func DownloadSkin(url string, alex bool) (sk Skin, err error) {
 	}
 
 	err = lhttp.ExpectContent(resp, lhttp.TypePNG)
-	if err != nil {
-		return
-	}
-
-	img, err := png.Decode(resp.Body)
-	if err != nil {
-		return
-	}
-
-	sk = CreateSkin(img, alex)
 	return
 }
 

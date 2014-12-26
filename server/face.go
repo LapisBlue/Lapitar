@@ -26,10 +26,7 @@ func serveFace(c web.C, w http.ResponseWriter, r *http.Request, size int, overla
 		return
 	}
 
-	skin, err := meta.Download()
-	if err != nil {
-		panic(err)
-	}
+	meta, skin := meta.Fetch()
 	prepareResponse(w, r, meta)
 
 	watch.Mark()

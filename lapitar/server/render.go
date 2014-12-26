@@ -36,13 +36,13 @@ func serveRender(c web.C, w http.ResponseWriter, r *http.Request, size int, conf
 
 	result, err := render.Render(skin, conf.Angle, conf.Tilt, conf.Zoom, size, sizeY, conf.SuperSampling, portrait, full, conf.Overlay, conf.Shadow, conf.Lighting, conf.Scale.Get())
 	if err == nil {
-		log.Println("Rendered head:", player, watch)
+		log.Println("Rendered head:", meta.Profile().Name(), watch)
 	} else {
-		printError(err, "Failed to render head:", player, watch)
+		printError(err, "Failed to render head:", meta.Profile().Name(), watch)
 		return
 	}
 
-	sendResult(w, player, result, watch)
+	sendResult(w, meta.Profile(), result, watch)
 	watch.Stop()
 }
 

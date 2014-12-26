@@ -20,6 +20,6 @@ func serveSkin(c web.C, w http.ResponseWriter, r *http.Request) {
 	meta, skin := meta.Fetch()
 	prepareResponse(w, r, meta)
 
-	sendResult(w, player, skin.Image(), watch)
+	sendResult(w, meta.Profile(), skin.Image(), watch)
 	watch.Stop()
 }

@@ -31,9 +31,9 @@ func serveFace(c web.C, w http.ResponseWriter, r *http.Request, size int, overla
 
 	watch.Mark()
 	result := face.Render(skin, size, overlay, conf.Scale.Get())
-	log.Println("Rendered face:", player, watch)
+	log.Println("Rendered face:", meta.Profile().Name(), watch)
 
-	sendResult(w, player, result, watch)
+	sendResult(w, meta.Profile(), result, watch)
 	watch.Stop()
 }
 

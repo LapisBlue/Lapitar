@@ -72,14 +72,14 @@ func prepareResponse(w http.ResponseWriter, r *http.Request, meta cache.SkinMeta
 	w.Header().Add("Last-Modified", meta.Timestamp().UTC().Format(http.TimeFormat))
 }
 
-func sendResult(w http.ResponseWriter, player string, result image.Image, watch *util.StopWatch) (err error) {
+func sendResult(w http.ResponseWriter, profile mc.Profile, result image.Image, watch *util.StopWatch) (err error) {
 	watch.Mark()
 	w.Header().Add("Content-Type", "image/png")
 	err = png.Encode(w, result)
 	if err == nil {
-		log.Println("Sent response:", player, watch)
+		log.Println("Sent response:", profile.Name(), watch)
 	} else {
-		printError(err, "Failed to send response:", player, watch)
+		printError(err, "Failed to send response:", profile.Name(), watch)
 	}
 
 	return

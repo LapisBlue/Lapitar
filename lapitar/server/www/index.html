@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="//cdn.jsdelivr.net/fontawesome/4.2.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="lapitar.css">
 
-    <link rel="icon" href="head/32/Aesen_.png">
+    <link rel="icon" href="head/32/93a09a981fbb46da85a6f0bb1465dc53.png">
 
     <title>Lapitar</title>
 </head>
@@ -34,83 +34,87 @@
         </div>
     </nav>
     <div class="container">
-        <div class="alert alert-dismissable alert-danger">
+        <div class="alert alert-dismissable alert-warning">
+            <button type="button" class="close" data-dismiss="alert">×</button>
             <strong>Warning:</strong> Lapitar is still in development and shouldn't be used in production yet. It will be down from time to time when we fix bugs or update it with new features.
         </div>
         <div class="row">
             <h4>Lapitar is a new <strong>open source</strong> Minecraft avatar service, providing 2D and 3D avatars with a simple API.</h4>
-            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2"><img src="head/256/Aesen_.png" title="Aesen"></div>
-            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2"><img src="head/256/Notch.png" title="Notch"></div>
-            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2"><img src="head/256/Dinnerbone.png" title="Dinnerbone"></div>
-            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2"><img src="head/256/md_5.png" title="md_5"></div>
-            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2"><img src="head/256/sk89q.png" title="sk89q"></div>
-            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2"><img src="head/256/Minecrell.png" title="Minecrell"></div>
+            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2"><img src="head/256/93a09a981fbb46da85a6f0bb1465dc53" title="Aesen"></div>
+            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2"><img src="head/256/069a79f444e94726a5befca90e38aaf5" title="Notch"></div>
+            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2"><img src="head/256/61699b2ed3274a019f1e0ea8c3f06bc6" title="Dinnerbone"></div>
+            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2"><img src="head/256/af74a02d19cb445bb07f6866a861f783" title="md_5"></div>
+            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2"><img src="head/256/0ea8eca3dbf647cc9d1ac64551ca975c" title="sk89q"></div>
+            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2"><img src="head/256/e63cec4338f541d0b7f38593ae0c862f" title="Minecrell"></div>
+        </div>
+        <hr>
+        <div class="alert alert-info">
+            <strong>Note:</strong> Although it is not required, we highly recommend getting avatars by UUIDs instead of the names in bigger applications. For us, getting an avatar by UUID is faster and more reliable than by name. You can make your application more future-proof by converting everything to UUIDs as soon as possible.
         </div>
         <hr>
         <h2>Faces</h2>
         <div class="row">
             <div class="col-lg-8 col-md-8 col-sm-8">
                 <p>A simple, flat avatar with only the face of the player's skin. Use <strong>helm</strong> instead of <strong>face</strong> to add the head overlay additionally.</p>
-                <pre>https://lapitar.lapis.blue/face/[size]/&lt;player&gt;[.png]</pre>
-                <pre>https://lapitar.lapis.blue/helm/[size]/&lt;player&gt;[.png]</pre>
-                <h4>Example:</h4>
-                <pre>https://lapitar.lapis.blue/face/128/Aesen_.png</pre>
+                <pre>https://lapitar.lapis.blue/face/[Size]/&lt;UUID|Name&gt;[.png]<br>https://lapitar.lapis.blue/helm/[Size]/&lt;UUID|Name&gt;[.png]</pre>
+                <h4>Example:</h4><div class="clearfix visible-xs-block"></div>
+                <pre>https://lapitar.lapis.blue/face/Aesen_.png<br>https://lapitar.lapis.blue/helm/256/93a09a981fbb46da85a6f0bb1465dc53</pre>
             </div>
             <div class="clearfix visible-xs-block"></div>
-            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6"><img class="pixelated" src="helm/128/Minecrell.png"></div>
-            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6"><img class="pixelated" src="helm/128/Aesen_.png"></div>
+            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6"><img class="pixelated" src="helm/128/e63cec4338f541d0b7f38593ae0c862f"></div>
+            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6"><img class="pixelated" src="helm/128/93a09a981fbb46da85a6f0bb1465dc53"></div>
         </div>
         <hr>
         <h2>Heads</h2>
         <div class="row">
             <div class="col-lg-8 col-md-8 col-sm-8">
                 <p>A perspective avatar with the head of the player's skin.</p>
-                <pre>https://lapitar.lapis.blue/head/[size]/&lt;player&gt;[.png]</pre>
+                <pre>https://lapitar.lapis.blue/head/[Size]/&lt;UUID|Name&gt;[.png]</pre>
                 <h4>Example:</h4>
-                <pre>https://lapitar.lapis.blue/head/128/Aesen_.png</pre>
+                <pre>https://lapitar.lapis.blue/head/Aesen_.png<br>https://lapitar.lapis.blue/head/256/93a09a981fbb46da85a6f0bb1465dc53</pre>
             </div>
             <div class="clearfix visible-xs-block"></div>
-            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6"><img src="head/256/Minecrell.png"></div>
-            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6"><img src="head/256/Aesen_.png"></div>
+            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6"><img src="head/256/e63cec4338f541d0b7f38593ae0c862f"></div>
+            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6"><img src="head/256/93a09a981fbb46da85a6f0bb1465dc53"></div>
         </div>
         <hr>
         <h2>Portraits</h2>
         <div class="row">
             <div class="col-lg-8 col-md-8 col-sm-8">
                 <p>A perspective avatar with a portrait of the player's skin.</p>
-                <pre>https://lapitar.lapis.blue/portrait/[size]/&lt;player&gt;[.png]</pre>
+                <pre>https://lapitar.lapis.blue/portrait/[Size]/&lt;UUID|Name&gt;[.png]</pre>
                 <h4>Example:</h4>
-                <pre>https://lapitar.lapis.blue/portrait/128/Aesen_.png</pre>
+                <pre>https://lapitar.lapis.blue/portrait/Aesen_.png<br>https://lapitar.lapis.blue/portrait/256/93a09a981fbb46da85a6f0bb1465dc53</pre>
             </div>
             <div class="clearfix visible-xs-block"></div>
-            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6"><img src="portrait/256/Minecrell.png"></div>
-            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6"><img src="portrait/256/Aesen_.png"></div>
+            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6"><img src="portrait/256/e63cec4338f541d0b7f38593ae0c862f"></div>
+            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6"><img src="portrait/256/93a09a981fbb46da85a6f0bb1465dc53"></div>
         </div>
         <hr>
         <h2>Players</h2>
         <div class="row">
             <div class="col-lg-8 col-md-8 col-sm-8">
                 <p>A full render of the player's skin.</p>
-                <pre>https://lapitar.lapis.blue/player/[size]/&lt;player&gt;[.png]</pre>
+                <pre>https://lapitar.lapis.blue/player/[Size]/&lt;UUID|Name&gt;[.png]</pre>
                 <h4>Example:</h4>
-                <pre>https://lapitar.lapis.blue/player/128/Aesen_.png</pre>
+                <pre>https://lapitar.lapis.blue/player/Aesen_.png<br>https://lapitar.lapis.blue/player/256/93a09a981fbb46da85a6f0bb1465dc53</pre>
             </div>
             <div class="clearfix visible-xs-block"></div>
-            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6"><img src="player/256/Minecrell.png"></div>
-            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6"><img src="player/256/Aesen_.png"></div>
+            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6"><img src="player/256/e63cec4338f541d0b7f38593ae0c862f"></div>
+            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6"><img src="player/256/93a09a981fbb46da85a6f0bb1465dc53"></div>
         </div>
         <hr>
         <h2>Skins</h2>
         <div class="row">
             <div class="col-lg-8 col-md-8 col-sm-8">
                 <p>The raw skin of the player. This will return the player's skin as-is, with no modifications.</p>
-                <pre>https://lapitar.lapis.blue/skin/&lt;player&gt;[.png]</pre>
+                <pre>https://lapitar.lapis.blue/skin/&lt;UUID|Name&gt;[.png]</pre>
                 <h4>Example:</h4>
-                <pre>https://lapitar.lapis.blue/skin/Aesen_.png</pre>
+                <pre>https://lapitar.lapis.blue/skin/Aesen_.png<br>https://lapitar.lapis.blue/skin/93a09a981fbb46da85a6f0bb1465dc53</pre>
             </div>
             <div class="clearfix visible-xs-block"></div>
-            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6"><img class="pixelated" src="skin/Minecrell.png"></div>
-            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6"><img class="pixelated" src="skin/Aesen_.png"></div>
+            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6"><img class="pixelated" src="skin/e63cec4338f541d0b7f38593ae0c862f"></div>
+            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6"><img class="pixelated" src="skin/93a09a981fbb46da85a6f0bb1465dc53"></div>
         </div>
         <hr>
         <footer>
@@ -118,5 +122,8 @@
             Made by <a href="https://github.com/Minecrell">Minecrell</a> and <a href="https://github.com/AesenV">Aesen</a>.
         </footer>
     </div>
+
+    <script src="//cdn.jsdelivr.net/jquery/2.1.3/jquery.min.js"></script>
+    <script src="//cdn.jsdelivr.net/bootstrap/3.3.1/js/bootstrap.min.js"></script>
 </body>
 </html>

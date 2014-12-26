@@ -17,7 +17,7 @@ var usage = cli.Usage().
 	Cmd("Usage: %s <command> [args]").
 	Add("").
 	Add("Commands:").
-	Help("create <type> [flags] <names...>", "Render an avatar using the command line.").
+	//Help("create <type> [flags] <names...>", "Render an avatar using the command line.").
 	Help("server [flags]", "Start the webserver.").
 	Help("help [command]", "Display this help page or more information about another command.").
 	Add("").
@@ -39,8 +39,8 @@ func Run(name string, args []string) int {
 	}
 
 	switch command {
-	case "create":
-		return cli.Run(name+" "+command, args[1:])
+	/*case "create":
+	return cli.Run(name+" "+command, args[1:])*/
 	case "server":
 		return server.Run(name+" "+command, args[1:])
 	default:

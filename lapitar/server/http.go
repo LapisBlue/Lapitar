@@ -63,9 +63,8 @@ func register(pattern string, handler interface{}) {
 }
 
 func serveLapitar(c *web.C, h http.Handler) http.Handler {
-	fn := func(w http.ResponseWriter, r *http.Request) {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Server", lapitar.DisplayName)
 		h.ServeHTTP(w, r)
-	}
-	return http.HandlerFunc(fn)
+	})
 }

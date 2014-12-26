@@ -69,7 +69,7 @@ func prepareResponse(w http.ResponseWriter, r *http.Request, meta cache.SkinMeta
 	w.Header().Add("Cache-Control", cacheControl)
 	w.Header().Add("Expires", time.Now().Add(keepCache).UTC().Format(http.TimeFormat))
 	w.Header().Add("ETag", meta.ID())
-	//w.Header().Add("Last-Modified", meta.LastMod().UTC().Format(http.TimeFormat))
+	w.Header().Add("Last-Modified", meta.Timestamp().UTC().Format(http.TimeFormat))
 }
 
 func sendResult(w http.ResponseWriter, player string, result image.Image, watch *util.StopWatch) (err error) {

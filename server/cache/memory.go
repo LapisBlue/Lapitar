@@ -175,6 +175,16 @@ func (meta *memorySkinMeta) Fetch() (m SkinMeta, sk mc.Skin) {
 	meta.lock.Lock()
 	defer meta.lock.Unlock()
 
+	if meta.fallback == nil {
+		sk = meta.skin
+	} else {
+		m, sk = meta.fallback.Fetch()
+	}
+
+	if sk != nil {
+		return
+	}
+
 	sk, err := meta.SkinMeta.Download()
 	if err != nil {
 		// Meh, we can't download the skin right now

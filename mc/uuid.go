@@ -12,7 +12,7 @@ func IsUUID(uuid string) bool {
 	}
 
 	for _, c := range uuid {
-		if !((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9')) {
+		if !((c >= 'a' && c <= 'z') || (c >= '0' && c <= '9')) {
 			return false
 		}
 	}

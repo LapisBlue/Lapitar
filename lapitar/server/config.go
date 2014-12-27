@@ -14,8 +14,12 @@ const (
 )
 
 type config struct {
-	Address  string        `json:"address"`
-	Proxy    bool          `json:"proxy"`
+	Address  string          `json:"address"`
+	Proxy    bool            `json:"proxy"`
+	Defaults *renderDefaults `json:"defaults"`
+}
+
+type renderDefaults struct {
 	Head     *renderConfig `json:"head"`
 	Portrait *renderConfig `json:"portrait"`
 	Body     *renderConfig `json:"body"`
@@ -47,12 +51,14 @@ func defaultConfig() *config {
 	return &config{
 		":8088",
 		false,
-		newRenderConfig(-35, 20, -4.5),
-		newRenderConfig(25, 10, -4.5),
-		newRenderConfig(25, 10, -6),
-		&faceConfig{
-			&limitedInt{128, 512},
-			&scaling{face.DefaultScale},
+		&renderDefaults{
+			newRenderConfig(-35, 20, -4.5),
+			newRenderConfig(25, 10, -4.5),
+			newRenderConfig(25, 10, -6),
+			&faceConfig{
+				&limitedInt{128, 512},
+				&scaling{face.DefaultScale},
+			},
 		},
 	}
 }

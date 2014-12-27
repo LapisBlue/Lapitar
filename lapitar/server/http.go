@@ -12,12 +12,12 @@ import (
 )
 
 var (
-	defaults *config
+	defaults *renderDefaults
 	//decoder  = schema.NewDecoder()
 )
 
 func start(conf *config, www string) {
-	defaults = conf
+	defaults = conf.Defaults
 	flag.Set("bind", conf.Address) // Uh, I guess that's a bit strange
 	if conf.Proxy {
 		goji.Insert(middleware.RealIP, middleware.Logger)

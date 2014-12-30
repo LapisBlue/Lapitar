@@ -18,11 +18,16 @@ type memorySkinCache struct {
 }
 
 func Memory() SkinCache {
-	return &memorySkinCache{
+	result := &memorySkinCache{
 		uuidLoader: make(map[string]chan SkinMeta),
 		skins:      make(map[string]SkinMeta),
 		skinLoader: make(map[string]chan SkinMeta),
 	}
+
+	result.skins["steve"] = Steve()
+	result.skins["char"] = Steve()
+	result.skins["alex"] = Alex()
+	return result
 }
 
 type memorySkinMeta struct {
@@ -56,7 +61,7 @@ func (cache *memorySkinCache) FetchByName(realName string) (skin SkinMeta) {
 
 	profile, err := mc.FetchProfile(name)
 	if profile == nil || err != nil {
-		log.Println("Failed to fetch UUID for", name, err)
+		log.Println("Failed to fetch UUID for", realName, err)
 		skin = FallbackByName(realName)
 		loader <- skin
 		go cache.pushFallbackSkin(name, skin)

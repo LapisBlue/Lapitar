@@ -25,7 +25,6 @@ func Memory() SkinCache {
 	}
 
 	result.skins["steve"] = Steve()
-	result.skins["char"] = Steve()
 	result.skins["alex"] = Alex()
 	return result
 }

@@ -24,9 +24,9 @@ Lapitar is primarily tested on the latest Ubuntu LTS and Go release. Other distr
 
     - Ubuntu: `sudo apt-get install build-essential pkg-config libosmesa6-dev libglu1-mesa-dev`
 
-- Install and compile Lapitar by executing the following command: `go get github.com/LapisBlue/Lapitar`
-- The executable will be created in `$GOPATH/bin/Lapitar`.
-- If you want to update Lapitar later you can execute `go get -u github.com/LapisBlue/Lapitar`.
+- Install and compile Lapitar by executing the following command: `go get github.com/LapisBlue/lapitar/lapitar`
+- The executable will be created in `$GOPATH/bin/lapitar`.
+- If you want to update Lapitar later you can execute `go get -u github.com/LapisBlue/lapitar/lapitar`.
 
 [Lapitar]: https://lapitar.lapis.blue
 [Go]: https://golang.org

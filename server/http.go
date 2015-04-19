@@ -2,7 +2,7 @@ package server
 
 import (
 	"flag"
-	"github.com/LapisBlue/Lapitar/lapitar"
+	"github.com/LapisBlue/lapitar"
 	"github.com/zenazn/goji"
 	"github.com/zenazn/goji/web"
 	"github.com/zenazn/goji/web/middleware"

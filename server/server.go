@@ -2,8 +2,8 @@ package server
 
 import (
 	"fmt"
-	"github.com/LapisBlue/Lapitar/lapitar/cli"
-	"github.com/LapisBlue/Lapitar/lapitar/server/cache"
+	"github.com/LapisBlue/lapitar/cli"
+	"github.com/LapisBlue/lapitar/server/cache"
 	"github.com/ogier/pflag"
 	"os"
 	"path/filepath"
@@ -12,7 +12,7 @@ import (
 const (
 	serverConfig = "lapitar.json"
 	//cacheFolder  = "caches"
-	wwwFolder = "src/github.com/LapisBlue/Lapitar/lapitar/server/www"
+	wwwFolder = "src/github.com/LapisBlue/lapitar/server/www"
 )
 
 func Run(name string, args []string) int {

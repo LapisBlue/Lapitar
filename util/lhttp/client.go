@@ -2,7 +2,7 @@ package lhttp
 
 import (
 	"errors"
-	"github.com/LapisBlue/Lapitar/lapitar"
+	"github.com/LapisBlue/lapitar"
 	"io"
 	"net/http"
 	"net/url"

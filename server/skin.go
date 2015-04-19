@@ -1,7 +1,7 @@
 package server
 
 import (
-	"github.com/LapisBlue/Lapitar/lapitar/util"
+	"github.com/LapisBlue/lapitar/util"
 	"github.com/zenazn/goji/web"
 	"net/http"
 )

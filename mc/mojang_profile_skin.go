@@ -4,7 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
-	"github.com/LapisBlue/Lapitar/lapitar/util/lhttp"
+	"github.com/LapisBlue/lapitar/util/lhttp"
 	"path"
 )
 

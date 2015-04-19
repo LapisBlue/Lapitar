@@ -1,7 +1,7 @@
 package cache
 
 import (
-	"github.com/LapisBlue/Lapitar/lapitar/mc"
+	"github.com/LapisBlue/lapitar/mc"
 	"time"
 )
 

@@ -1,8 +1,8 @@
 package face
 
 import (
-	"github.com/LapisBlue/Lapitar/lapitar/mc"
-	"github.com/LapisBlue/Lapitar/lapitar/util"
+	"github.com/LapisBlue/lapitar/mc"
+	"github.com/LapisBlue/lapitar/util"
 	"github.com/disintegration/imaging"
 	"image"
 	"image/draw"

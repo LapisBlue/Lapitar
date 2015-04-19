@@ -1,9 +1,9 @@
 package server
 
 import (
-	"github.com/LapisBlue/Lapitar/lapitar/mc"
-	"github.com/LapisBlue/Lapitar/lapitar/server/cache"
-	"github.com/LapisBlue/Lapitar/lapitar/util"
+	"github.com/LapisBlue/lapitar/mc"
+	"github.com/LapisBlue/lapitar/server/cache"
+	"github.com/LapisBlue/lapitar/util"
 	"github.com/zenazn/goji/web"
 	"image"
 	"image/png"

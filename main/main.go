@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/LapisBlue/Lapitar/lapitar/cli"
-	"github.com/LapisBlue/Lapitar/lapitar/server"
+	"github.com/LapisBlue/lapitar/cli"
+	"github.com/LapisBlue/lapitar/server"
 	"os"
 	"path/filepath"
 	"runtime"

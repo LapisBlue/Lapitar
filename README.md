@@ -1,4 +1,7 @@
 # Lapitar [![Build Status](https://travis-ci.org/LapisBlue/Lapitar.svg?branch=master)](https://travis-ci.org/LapisBlue/Lapitar)
+
+__Note: Lapitar is not actively maintained and deprecated. It was replaced by [Visage](https://github.com/unascribed/Visage) which is hosted at https://visage.gameminers.com.__
+
 [Lapitar] is a new **open source** Minecraft avatar service, providing 2D and 3D avatars with a simple API. If you just want to test it out or use it on your website you can check out how to use Lapitar [on our website][Lapitar]. This readme describes how to setup your own [Lapitar] installation.
 
 ## Introduction
